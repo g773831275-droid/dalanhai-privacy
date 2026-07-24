@@ -8,13 +8,11 @@ workflows:
         XCODE_VERSION: 15.4
         BUNDLE_ID: "com.kaitengguan.dalanghai"
     scripts:
-      # 1. 安全创建并填充www文件夹（关键修改：先判断文件是否存在再复制）
+      # 1. 安全创建并填充www文件夹（适配你没有css/js文件的情况）
       - name: Prepare web directory
         script: |
           mkdir -p www
-          # 复制index.html（必须文件，不存在会报错）
           cp index.html www/
-          # 可选文件，不存在也不会报错
           if ls *.css 1> /dev/null 2>&1; then cp *.css www/; fi
           if ls *.js 1> /dev/null 2>&1; then cp *.js www/; fi
           if ls *.png 1> /dev/null 2>&1; then cp *.png www/; fi
@@ -32,9 +30,34 @@ workflows:
       - name: Sync Capacitor iOS
         script: |
           npx cap sync ios
-      # 5. 编译Release包
+      # 5. 用Xcode原生命令编译Release版本（关键修改！替代cap build命令）
       - name: Build iOS Release
         script: |
-          npx cap build ios --release
+          cd ios/App
+          # 先创建导出配置文件
+          cat > exportOptions.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>teamID</key>
+            <string>YOUR_TEAM_ID</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+          </dict>
+          </plist>
+          EOF
+          # 编译并打包
+          xcodebuild archive \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -archivePath ./build/App.xcarchive
+          xcodebuild -exportArchive \
+            -archivePath ./build/App.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath ./build/ipa
     artifacts:
-      - ios/App/build/ios/ipa/*.ipa
+      - ios/App/build/ipa/*.ipa
