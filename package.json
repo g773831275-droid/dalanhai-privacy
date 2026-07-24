@@ -1,0 +1,20 @@
+{
+  "name": "dalanhai",
+  "version": "1.0.0",
+  "description": "大蓝海 - 自律打卡App",
+  "private": true,
+  "scripts": {
+    "sync": "cap sync",
+    "add:ios": "cap add ios",
+    "open:ios": "cap open ios",
+    "copy": "cap copy ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "puppeteer": "^25.3.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}

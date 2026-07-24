@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>大蓝海</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#F4F5F7;--card:#FFFFFF;--text:#1D1D1F;--sub:#86868B;--line:#E5E5EA;
+    --blue:#185FA5;--blue-bg:#E6F1FB;--teal:#0F6E56;--teal-bg:#E1F5EE;
+    --amber:#854F0B;--amber-bg:#FAEEDA;--purple:#534AB7;--purple-bg:#EEEDFE;
+    --green:#1D9E75;--red:#A32D2D;
+  }
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;overflow:hidden}
+  #app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;background:var(--bg);position:relative}
+
+  /* 状态栏占位 */
+  .statusbar{height:env(safe-area-inset-top,20px);background:transparent}
+
+  /* 顶部标题 */
+  .topbar{padding:8px 16px 12px;display:flex;align-items:center;justify-content:space-between;background:var(--bg)}
+  .topbar h1{font-size:20px;font-weight:600;letter-spacing:-0.3px}
+  .topbar .sub{font-size:12px;color:var(--sub)}
+
+  /* 内容区 */
+  .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 90px}
+
+  /* 首页岛屿卡片 */
+  .island-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:transform .1s}
+  .island-card:active{transform:scale(.98)}
+  .island-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+  .island-info{flex:1;min-width:0}
+  .island-name{font-size:16px;font-weight:600;margin-bottom:2px}
+  .island-slogan{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .island-meta{font-size:11px;color:var(--sub);margin-top:4px}
+  .island-streak{font-size:13px;font-weight:600;padding:4px 10px;border-radius:20px;flex-shrink:0}
+
+  /* 创建岛屿入口 */
+  .create-card{background:transparent;border:1.5px dashed var(--line);border-radius:16px;padding:16px;text-align:center;color:var(--sub);font-size:14px;margin-bottom:12px;cursor:pointer}
+  .create-card:active{background:var(--card)}
+
+  /* 岛屿详情 */
+  .detail-hero{border-radius:16px;padding:20px;text-align:center;margin-bottom:14px}
+  .detail-hero .ic{font-size:44px;margin-bottom:8px}
+  .detail-hero h2{font-size:20px;font-weight:600;margin-bottom:4px}
+  .detail-hero .slogan{font-size:13px;opacity:.8}
+  .streak-big{font-size:48px;font-weight:700;line-height:1;margin:14px 0 4px}
+  .streak-label{font-size:13px;color:var(--sub);margin-bottom:16px}
+
+  .btn-primary{width:100%;padding:15px;border:none;border-radius:14px;font-size:16px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .1s}
+  .btn-primary:active{opacity:.85}
+  .btn-primary:disabled{opacity:.4}
+  .btn-ad{background:var(--card);color:var(--amber);border:1.5px solid var(--amber);margin-top:10px}
+
+  /* 21天进度格子 */
+  .progress-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:16px 0}
+  .grid-cell{aspect-ratio:1;border-radius:8px;background:var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--sub)}
+  .grid-cell.done{color:#fff;font-weight:600}
+  .grid-cell.today{outline:2px solid var(--text);outline-offset:2px}
+
+  /* 区块标题 */
+  .section-title{font-size:13px;color:var(--sub);margin:18px 0 10px;font-weight:500}
+
+  /* 列表项 */
+  .list-item{background:var(--card);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px}
+  .list-item:active{background:#fafafa}
+  .list-item .li-ic{font-size:22px;width:28px;text-align:center}
+  .list-item .li-text{flex:1;font-size:15px}
+  .list-item .li-arrow{color:var(--line);font-size:18px}
+
+  /* 征服证书墙 */
+  .cert-card{background:linear-gradient(135deg,#FFF8E7,#F5E6C8);border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #E8D9B0}
+  .cert-card .ct{font-size:15px;font-weight:600;color:var(--amber)}
+  .cert-card .cd{font-size:12px;color:#9B7B3A;margin-top:4px}
+
+  /* 底部 tab */
+  .tabbar{position:absolute;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;height:calc(64px + env(safe-area-inset-bottom,0px));background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:.5px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--sub);cursor:pointer;font-size:10px}
+  .tab.active{color:var(--blue)}
+  .tab .ti{font-size:22px;line-height:1}
+
+  /* 弹窗 */
+  .mask{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
+  .mask.show{display:flex}
+  .modal{background:var(--card);border-radius:20px;padding:28px 24px;max-width:340px;width:100%;text-align:center;animation:pop .2s}
+  @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal h3{font-size:18px;font-weight:600;margin-bottom:8px}
+  .modal p{font-size:14px;color:var(--sub);margin-bottom:16px}
+  .modal .btn-primary{margin-top:8px}
+  .modal .btn-ghost{background:transparent;color:var(--sub);border:none;padding:12px;font-size:14px;cursor:pointer;width:100%}
+
+  /* 证书弹窗 */
+  .cert-modal{background:linear-gradient(160deg,#FFF8E7,#F0DFA8);border:1px solid #D9C485}
+  .cert-modal .badge{font-size:56px;margin-bottom:8px}
+  .cert-modal h3{color:var(--amber);font-size:20px}
+  .cert-modal .cert-info{font-size:13px;color:#7B5A1E;background:rgba(255,255,255,.5);border-radius:10px;padding:12px;margin:14px 0}
+
+  /* 客服弹窗 */
+  .qr-box{width:180px;height:180px;background:#fff;border:1px solid var(--line);border-radius:12px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;position:relative}
+  .qr-box svg{width:140px;height:140px}
+
+  /* 广告补签模拟 */
+  .ad-modal{padding:0;overflow:hidden;max-width:300px}
+  .ad-screen{background:#000;color:#fff;padding:40px 24px;text-align:center}
+  .ad-screen .ad-label{font-size:11px;opacity:.6;margin-bottom:16px}
+  .ad-screen .ad-count{font-size:48px;font-weight:700}
+  .ad-screen .ad-hint{font-size:12px;opacity:.7;margin-top:12px}
+
+  /* 空状态 */
+  .empty{text-align:center;padding:60px 20px;color:var(--sub);font-size:14px}
+
+  /* 返回按钮 */
+  .back{font-size:28px;color:var(--text);cursor:pointer;padding:0 8px;line-height:1}
+
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="statusbar"></div>
+  <div class="topbar" id="topbar">
+    <span class="back hidden" id="backBtn" onclick="goBack()">‹</span>
+    <div>
+      <h1 id="topTitle">大蓝海</h1>
+      <div class="sub" id="topSub">为每一次坚持，找到一片蓝海</div>
+    </div>
+    <span style="width:28px"></span>
+  </div>
+
+  <div class="content" id="content"></div>
+
+  <div class="tabbar">
+    <div class="tab active" data-tab="home" onclick="switchTab('home')">
+      <span class="ti">🏝️</span><span>首页</span>
+    </div>
+    <div class="tab" data-tab="feed" onclick="switchTab('feed')">
+      <span class="ti">💬</span><span>动态</span>
+    </div>
+    <div class="tab" data-tab="mine" onclick="switchTab('mine')">
+      <span class="ti">👤</span><span>我的</span>
+    </div>
+  </div>
+</div>
+
+<!-- 征服证书弹窗 -->
+<div class="mask" id="maskCert">
+  <div class="modal cert-modal">
+    <div class="badge">🏆</div>
+    <h3 id="certTitle">征服证书</h3>
+    <div class="cert-info" id="certInfo"></div>
+    <p>恭喜你连续打卡 21 天，成功征服本岛！</p>
+    <button class="btn-primary" style="background:var(--amber)" onclick="openService();closeMask('maskCert')">加入官方自律群</button>
+    <button class="btn-ghost" onclick="closeMask('maskCert')">稍后再说</button>
+  </div>
+</div>
+
+<!-- 客服微信弹窗 -->
+<div class="mask" id="maskService">
+  <div class="modal">
+    <h3>联系客服 · 进官方群</h3>
+    <p>长按识别二维码，添加客服微信<br>客服会拉你进入对应岛屿的官方微信群</p>
+    <div class="qr-box">
+      <img src="wechat-qr.jpg" style="width:140px;height:140px;border-radius:8px" alt="客服微信二维码">
+    </div>
+    <p style="font-size:12px;color:var(--sub);margin-bottom:12px">客服微信：abccba978</p>
+    <button class="btn-primary" style="background:var(--green)" onclick="closeMask('maskService')">我知道了</button>
+  </div>
+</div>
+
+<!-- 广告补签弹窗 -->
+<div class="mask" id="maskAd">
+  <div class="modal ad-modal">
+    <div class="ad-screen">
+      <div class="ad-label">广告 · 补签中</div>
+      <div class="ad-count" id="adCount">5</div>
+      <div class="ad-hint">观看完成即可补签今日打卡</div>
+    </div>
+  </div>
+</div>
+
+<!-- 通用提示弹窗 -->
+<div class="mask" id="maskToast">
+  <div class="modal">
+    <h3 id="toastTitle">提示</h3>
+    <p id="toastText"></p>
+    <button class="btn-primary" style="background:var(--blue)" onclick="closeMask('maskToast')">好的</button>
+  </div>
+</div>
+
+<!-- 注销账号确认 -->
+<div class="mask" id="maskDelete">
+  <div class="modal">
+    <h3>注销账号</h3>
+    <p>注销后将清除本地所有打卡数据，并在7天冷静期后彻底删除账号。<br><strong>此操作不可撤销，确定继续？</strong></p>
+    <button class="btn-primary" style="background:var(--red)" onclick="doDelete()">确认注销</button>
+    <button class="btn-ghost" onclick="closeMask('maskDelete')">取消</button>
+  </div>
+</div>
+
+<script>
+const ISLANDS=[
+  {id:'qingxin',name:'清心岛',slogan:'一念清净，海阔天空',action:'今日已坚持',icon:'🧘',color:'#534AB7',bg:'#EEEDFE'},
+  {id:'jieyan',name:'戒烟岛',slogan:'今天少一根，明天多一天',action:'今日未吸烟',icon:'🚭',color:'#0F6E56',bg:'#E1F5EE'},
+  {id:'jianshen',name:'健身岛',slogan:'每一滴汗都是勋章',action:'今日已运动',icon:'💪',color:'#185FA5',bg:'#E6F1FB'},
+  {id:'zaoshui',name:'早睡岛',slogan:'23:00前入睡，给身体一个交代',action:'今日已早睡',icon:'🌙',color:'#854F0B',bg:'#FAEEDA'},
+];
+
+const TARGET=21;
+const AD_MAKEUP_ENABLED=false; // 首版隐藏广告补签，避免无真实广告SDK被拒审；接好AdMob后改true即可恢复
+let currentView={tab:'home',island:null};
+
+/* ===== 数据层 ===== */
+function loadData(){
+  try{return JSON.parse(localStorage.getItem('dalanhai')||'{"checkins":{},"certificates":[]}');}
+  catch(e){return {checkins:{},certificates:[]};}
+}
+function saveData(d){localStorage.setItem('dalanhai',JSON.stringify(d));}
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+function getCheckins(id){return loadData().checkins[id]||[];}
+function isCheckedToday(id){return getCheckins(id).includes(todayStr());}
+function streak(id){
+  const set=new Set(getCheckins(id));
+  if(!set.size)return 0;
+  let count=0,d=new Date();
+  if(!set.has(dateStr(d)))return 0; // 今天没打卡视为已中断
+  while(set.has(dateStr(d))){count++;d.setDate(d.getDate()-1);}
+  return count;
+}
+function totalDays(id){return getCheckins(id).length;}
+
+function doCheckin(id){
+  const d=loadData(),t=todayStr();
+  if(!d.checkins[id])d.checkins[id]=[];
+  if(d.checkins[id].includes(t))return false;
+  d.checkins[id].push(t);
+  saveData(d);
+  // 检查21天达成
+  if(streak(id)>=TARGET && !d.certificates.some(c=>c.island===id)){
+    d.certificates.push({island:id,date:t});
+    saveData(d);
+    return 'cert';
+  }
+  return true;
+}
+
+/* ===== 视图渲染 ===== */
+function render(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===currentView.tab));
+  const c=document.getElementById('content');
+  const back=document.getElementById('backBtn');
+  if(currentView.island){
+    back.classList.remove('hidden');
+    document.getElementById('topTitle').textContent=getIsland(currentView.island).name;
+    document.getElementById('topSub').textContent='连续打卡'+streak(currentView.island)+'天';
+    c.innerHTML=renderIsland(currentView.island);
+  }else{
+    back.classList.add('hidden');
+    if(currentView.tab==='home'){
+      document.getElementById('topTitle').textContent='大蓝海';
+      document.getElementById('topSub').textContent='为每一次坚持，找到一片蓝海';
+      c.innerHTML=renderHome();
+    }else if(currentView.tab==='feed'){
+      document.getElementById('topTitle').textContent='动态';
+      document.getElementById('topSub').textContent='和岛民们一起坚持';
+      c.innerHTML='<div class="empty">🏝️ 岛屿动态即将开放<br>先去打卡，找到你的同路人</div>';
+    }else if(currentView.tab==='mine'){
+      document.getElementById('topTitle').textContent='我的';
+      document.getElementById('topSub').textContent='看看你坚持了多久';
+      c.innerHTML=renderMine();
+    }
+  }
+}
+function getIsland(id){return ISLANDS.find(i=>i.id===id);}
+
+function renderHome(){
+  let html='';
+  ISLANDS.forEach(is=>{
+    const s=streak(is.id),done=isCheckedToday(is.id);
+    const meta=done?'今日已打卡 · '+totalDays(is.id)+'天累计':'今日未打卡';
+    html+=`<div class="island-card" onclick="openIsland('${is.id}')">
+      <div class="island-icon" style="background:${is.bg}">${is.icon}</div>
+      <div class="island-info">
+        <div class="island-name">${is.name}</div>
+        <div class="island-slogan">${is.slogan}</div>
+        <div class="island-meta">${meta}</div>
+      </div>
+      <div class="island-streak" style="background:${is.bg};color:${is.color}">${s}天</div>
+    </div>`;
+  });
+  html+=`<div class="create-card" onclick="toast('创建岛屿','自定义岛屿功能将在 V1.2 上线，敬请期待')">+ 创建自定义岛屿（申请岛主）</div>`;
+  return html;
+}
+
+function renderIsland(id){
+  const is=getIsland(id),s=streak(id),done=isCheckedToday(id);
+  const checkins=getCheckins(id);
+  // 最近21天格子
+  let grid='';
+  const today=new Date();
+  for(let i=20;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    const ds=dateStr(d),has=checkins.includes(ds);
+    const isToday=ds===todayStr();
+    let style=has?`background:${is.color}`:'';
+    grid+=`<div class="grid-cell ${has?'done':''} ${isToday?'today':''}" style="${style}">${d.getDate()}</div>`;
+  }
+  const btn=done
+    ?`<button class="btn-primary" style="background:${is.color}" disabled>✓ 今日已打卡（${is.action}）</button>`
+    :`<button class="btn-primary" style="background:${is.color}" onclick="checkin('${id}')">去打卡 · ${is.action}</button>`;
+  const adBtn=(done||!AD_MAKEUP_ENABLED)?'':`<button class="btn-ad btn-primary" onclick="watchAd('${id}')">看广告补签今日</button>`;
+  const certNote=s>=TARGET?'<div class="cert-card"><div class="ct">🏆 已征服本岛</div><div class="cd">你已连续打卡 21 天，可联系客服进官方群</div></div>':'';
+  return `
+    <div class="detail-hero" style="background:${is.bg}">
+      <div class="ic">${is.icon}</div>
+      <h2 style="color:${is.color}">${is.name}</h2>
+      <div class="slogan" style="color:${is.color}">${is.slogan}</div>
+      <div class="streak-big" style="color:${is.color}">${s}</div>
+      <div class="streak-label">连续打卡天数 / 目标 ${TARGET} 天</div>
+    </div>
+    ${certNote}
+    <div class="section-title">最近 21 天打卡</div>
+    <div class="progress-grid">${grid}</div>
+    ${btn}${adBtn}
+    <div class="section-title">岛屿规则</div>
+    <div class="list-item"><span class="li-ic">📌</span><span class="li-text">每日打卡"${is.action}"，连续 ${TARGET} 天征服本岛</span></div>
+    <div class="list-item" onclick="openService()"><span class="li-ic">👥</span><span class="li-text">进官方自律群找搭子</span><span class="li-arrow">›</span></div>
+  `;
+}
+
+function renderMine(){
+  const d=loadData();
+  let totalCheckins=0;ISLANDS.forEach(i=>totalCheckins+=totalDays(i.id));
+  const maxStreak=Math.max(0,...ISLANDS.map(i=>streak(i)));
+  const certCount=d.certificates.length;
+  let certs='';
+  if(certCount){
+    d.certificates.forEach(c=>{
+      const is=getIsland(c.island);
+      certs+=`<div class="cert-card"><div class="ct">🏆 征服 ${is.name}</div><div class="cd">连续打卡 ${TARGET} 天达成 · ${c.date}</div></div>`;
+    });
+  }else{
+    certs='<div class="empty">还没有征服证书<br>连续打卡 21 天即可获得</div>';
+  }
+  return `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      <div style="background:var(--card);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--blue)">${totalCheckins}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:2px">累计打卡</div>
+      </div>
+      <div style="background:var(--card);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--green)">${maxStreak}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:2px">最长连续</div>
+      </div>
+      <div style="background:var(--card);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--amber)">${certCount}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:2px">征服证书</div>
+      </div>
+    </div>
+    <div class="section-title">我的征服证书</div>
+    ${certs}
+    <div class="section-title">服务与设置</div>
+    <div class="list-item" onclick="openService()"><span class="li-ic">💬</span><span class="li-text">联系客服 / 进官方自律群</span><span class="li-arrow">›</span></div>
+    <div class="list-item" onclick="toast('打卡提醒','推送提醒功能将在 V1.1 上线')"><span class="li-ic">🔔</span><span class="li-text">打卡提醒</span><span class="li-arrow">›</span></div>
+    <div class="list-item" onclick="toast('隐私政策','请在 App 上线后查看完整隐私政策')"><span class="li-ic">🔒</span><span class="li-text">隐私政策</span><span class="li-arrow">›</span></div>
+    <div class="list-item" onclick="confirmDelete()"><span class="li-ic">🗑️</span><span class="li-text">注销账号</span><span class="li-arrow">›</span></div>
+    <div style="text-align:center;color:var(--sub);font-size:11px;margin-top:24px">大蓝海 V1.0 · App 内零收费</div>
+  `;
+}
+
+/* ===== 交互 ===== */
+function switchTab(tab){currentView={tab,island:null};render();window.scrollTo(0,0);}
+function openIsland(id){currentView={tab:currentView.tab,island:id};render();window.scrollTo(0,0);}
+function goBack(){currentView={tab:currentView.tab,island:null};render();window.scrollTo(0,0);}
+
+function checkin(id){
+  const r=doCheckin(id);
+  if(r==='cert'){
+    const is=getIsland(id);
+    document.getElementById('certTitle').textContent='征服 '+is.name;
+    document.getElementById('certInfo').textContent=is.name+' · 连续 '+TARGET+' 天 · '+todayStr();
+    render();
+    openMask('maskCert');
+  }else if(r){
+    render();
+    toast('打卡成功','连续打卡 '+streak(id)+' 天，距离目标还差 '+(TARGET-streak(id))+' 天');
+  }
+}
+
+let adTimer=null;
+function watchAd(id){
+  if(isCheckedToday(id)){toast('提示','今日已打卡，无需补签');return;}
+  document.getElementById('adCount').textContent='5';
+  openMask('maskAd');
+  let n=5;
+  adTimer=setInterval(()=>{
+    n--;
+    document.getElementById('adCount').textContent=n;
+    if(n<=0){
+      clearInterval(adTimer);
+      closeMask('maskAd');
+      doCheckin(id);
+      render();
+      toast('补签成功','已通过看广告完成今日补签，连续打卡 '+streak(id)+' 天');
+    }
+  },1000);
+}
+
+function openService(){openMask('maskService');}
+function confirmDelete(){openMask('maskDelete');}
+function doDelete(){
+  // 预留：后端注销接口，接入后端时取消注释并替换域名
+  // fetch('https://你的域名/api/account/delete',{method:'POST',credentials:'include'});
+  localStorage.removeItem('dalanhai');
+  closeMask('maskDelete');
+  currentView={tab:'home',island:null};
+  render();
+  toast('已注销','账号与本地打卡数据已清除。7天冷静期后将彻底删除。');
+}
+function openMask(id){document.getElementById(id).classList.add('show');}
+function closeMask(id){document.getElementById(id).classList.remove('show');if(adTimer){clearInterval(adTimer);adTimer=null;}}
+function toast(title,text){
+  document.getElementById('toastTitle').textContent=title;
+  document.getElementById('toastText').textContent=text;
+  openMask('maskToast');
+}
+
+/* 生成简易二维码占位图案 */
+function drawQR(){
+  const svg=document.getElementById('qrSvg');
+  let cells='';
+  const size=21,cell=140/size;
+  // 伪随机但稳定
+  let seed=7;
+  const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+    // 三个定位角
+    const corner=(x<7&&y<7)||(x>=size-7&&y<7)||(x<7&&y>=size-7);
+    let on;
+    if(corner){
+      const cx=x<7?3:size-4,cy=y<7?3:size-4;
+      on=(Math.abs(x-cx)<=2&&Math.abs(y-cy)<=2)&&!((Math.abs(x-cx)==1&&Math.abs(y-cy)<=1)||(Math.abs(x-cy)<=1&&Math.abs(y-cy)==1));
+      on=on||((Math.abs(x-cx)==3||Math.abs(y-cy)==3)&&Math.abs(x-cx)<=3&&Math.abs(y-cy)<=3);
+    }else{
+      on=rnd()>0.5;
+    }
+    if(on)cells+=`<rect x="${x*cell}" y="${y*cell}" width="${cell}" height="${cell}" fill="#1D1D1F"/>`;
+  }
+  svg.innerHTML=cells;
+}
+
+/* 初始化 */
+render();
+</script>
+</body>
+</html>

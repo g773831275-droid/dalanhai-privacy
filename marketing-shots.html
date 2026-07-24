@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:#000}
+.shot{width:1242px;height:2688px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+
+/* 通用背景装饰 */
+.glow{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5}
+.wave{position:absolute;left:0;right:0;width:100%}
+.header{position:relative;z-index:2;text-align:center;color:#fff;padding:150px 80px 0}
+.header h1{font-size:96px;font-weight:800;letter-spacing:-2px;line-height:1.05;text-shadow:0 4px 30px rgba(0,0,0,.25)}
+.header p{font-size:40px;margin-top:24px;opacity:.92;font-weight:400;letter-spacing:1px}
+.footer{position:absolute;bottom:90px;left:0;right:0;text-align:center;color:#fff;z-index:3}
+.footer .brand{font-size:44px;font-weight:700;letter-spacing:2px}
+.footer .tag{font-size:26px;margin-top:10px;opacity:.75}
+.content{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;padding:60px 80px}
+
+/* === Shot 1 首页 - 深蓝渐变 === */
+.shot1{background:linear-gradient(165deg,#062E52 0%,#0C447C 40%,#185FA5 100%)}
+.shot1 .glow1{width:700px;height:700px;background:#378ADD;top:-200px;right:-150px}
+.shot1 .glow2{width:500px;height:500px;background:#534AB7;bottom:200px;left:-100px;opacity:.4}
+.island-card{width:100%;background:rgba(255,255,255,.12);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.2);border-radius:32px;padding:36px 40px;margin-bottom:24px;display:flex;align-items:center;gap:32px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.island-icon{width:96px;height:96px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:50px;flex-shrink:0}
+.island-info{flex:1;color:#fff}
+.island-name{font-size:42px;font-weight:700}
+.island-slogan{font-size:24px;opacity:.8;margin-top:6px}
+.island-streak{font-size:30px;font-weight:700;color:#fff;background:rgba(255,255,255,.15);padding:10px 24px;border-radius:30px}
+
+/* === Shot 2 打卡 - 中蓝渐变 === */
+.shot2{background:linear-gradient(165deg,#0C447C 0%,#185FA5 50%,#378ADD 100%)}
+.shot2 .glow1{width:800px;height:800px;background:#fff;top:30%;left:50%;transform:translateX(-50%);opacity:.15}
+.checkin-circle{width:380px;height:380px;border-radius:50%;background:linear-gradient(145deg,#fff,#E6F1FB);display:flex;align-items:center;justify-content:center;box-shadow:0 40px 100px rgba(0,0,0,.3),0 0 0 20px rgba(255,255,255,.1)}
+.checkin-mark{font-size:180px;color:#1D9E75;font-weight:700}
+.checkin-text{color:#fff;text-align:center;margin-top:50px}
+.checkin-text .big{font-size:56px;font-weight:700}
+.checkin-text .small{font-size:30px;opacity:.85;margin-top:14px}
+
+/* === Shot 3 21天 - 蓝绿渐变（成长） === */
+.shot3{background:linear-gradient(165deg,#0C447C 0%,#0F6E56 60%,#1D9E75 100%)}
+.shot3 .glow1{width:600px;height:600px;background:#1D9E75;top:20%;right:-100px;opacity:.5}
+.streak-num{font-size:280px;font-weight:800;color:#fff;line-height:1;text-shadow:0 8px 40px rgba(0,0,0,.3)}
+.streak-label{font-size:48px;color:#fff;opacity:.9;margin-top:10px}
+.grid21{display:grid;grid-template-columns:repeat(7,1fr);gap:18px;margin-top:70px;width:100%}
+.grid-cell{aspect-ratio:1;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:24px;color:rgba(255,255,255,.5)}
+.grid-cell.done{background:linear-gradient(145deg,#F0C75E,#E0A82E);color:#5C3D00;font-weight:700;box-shadow:0 8px 20px rgba(240,199,94,.4)}
+.grid-cell.today{outline:4px solid #fff;outline-offset:4px}
+
+/* === Shot 4 证书 - 深紫金（隆重） === */
+.shot4{background:linear-gradient(165deg,#1A1340 0%,#3C3489 50%,#534AB7 100%)}
+.shot4 .glow1{width:700px;height:700px;background:#F0C75E;top:10%;left:50%;transform:translateX(-50%);opacity:.25}
+.cert{width:100%;background:linear-gradient(160deg,#FFF8E7,#F0DFA8);border:6px solid #D9C485;border-radius:40px;padding:70px 50px;text-align:center;box-shadow:0 40px 100px rgba(0,0,0,.4);position:relative}
+.cert::before{content:'';position:absolute;inset:18px;border:2px dashed #D9C485;border-radius:28px;pointer-events:none}
+.cert-badge{font-size:140px;line-height:1}
+.cert-title{font-size:60px;font-weight:800;color:#633806;margin-top:20px}
+.cert-sub{font-size:32px;color:#9B7B3A;margin-top:18px}
+.cert-line{width:120px;height:3px;background:#D9C485;margin:36px auto}
+.cert-info{font-size:28px;color:#7B5A1E}
+.particle{position:absolute;width:14px;height:14px;border-radius:50%;background:#F0C75E;opacity:.6}
+
+/* === Shot 5 数据 - 蓝紫渐变 === */
+.shot5{background:linear-gradient(165deg,#0C447C 0%,#185FA5 40%,#534AB7 100%)}
+.shot5 .glow1{width:600px;height:600px;background:#534AB7;top:-100px;right:-100px;opacity:.5}
+.stat-row{display:flex;gap:30px;margin-bottom:30px;width:100%}
+.stat-card{flex:1;background:rgba(255,255,255,.12);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.2);border-radius:28px;padding:44px 20px;text-align:center}
+.stat-icon{font-size:60px;margin-bottom:16px}
+.stat-num{font-size:80px;font-weight:800;color:#fff;line-height:1}
+.stat-label{font-size:26px;color:#fff;opacity:.8;margin-top:12px}
+.progress-bar{width:100%;height:24px;background:rgba(255,255,255,.15);border-radius:12px;margin-top:20px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#1D9E75,#5DCAA5);border-radius:12px}
+.heatmap{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-top:40px;width:100%}
+.heat-cell{aspect-ratio:1;border-radius:6px;background:rgba(255,255,255,.1)}
+.heat-cell.l1{background:rgba(29,158,117,.4)}
+.heat-cell.l2{background:rgba(29,158,117,.7)}
+.heat-cell.l3{background:#1D9E75}
+
+/* 海浪装饰 SVG 通用 */
+.wave-deco{position:absolute;bottom:0;left:0;width:100%;height:300px;z-index:1;opacity:.3}
+</style>
+</head>
+<body>
+
+<!-- Shot 1: 首页岛屿 -->
+<section class="shot shot1" id="s1">
+  <div class="glow glow1"></div>
+  <div class="glow glow2"></div>
+  <svg class="wave-deco" viewBox="0 0 1242 300" preserveAspectRatio="none"><path d="M0,150 Q310,80 620,150 T1242,150 L1242,300 L0,300 Z" fill="#378ADD" opacity=".4"/><path d="M0,200 Q310,130 620,200 T1242,200 L1242,300 L0,300 Z" fill="#378ADD" opacity=".6"/></svg>
+  <div class="header">
+    <h1>自律，从登岛开始</h1>
+    <p>四座岛屿 · 等你征服</p>
+  </div>
+  <div class="content">
+    <div class="island-card"><div class="island-icon" style="background:#EEEDFE">🧘</div><div class="island-info"><div class="island-name">清心岛</div><div class="island-slogan">一念清净，海阔天空</div></div><div class="island-streak">5天</div></div>
+    <div class="island-card"><div class="island-icon" style="background:#E1F5EE">🚭</div><div class="island-info"><div class="island-name">戒烟岛</div><div class="island-slogan">今天少一根，明天多一天</div></div><div class="island-streak">12天</div></div>
+    <div class="island-card"><div class="island-icon" style="background:#E6F1FB">💪</div><div class="island-info"><div class="island-name">健身岛</div><div class="island-slogan">每一滴汗都是勋章</div></div><div class="island-streak">8天</div></div>
+    <div class="island-card"><div class="island-icon" style="background:#FAEEDA">🌙</div><div class="island-info"><div class="island-name">早睡岛</div><div class="island-slogan">23点前入睡，给身体交代</div></div><div class="island-streak">21天</div></div>
+  </div>
+  <div class="footer"><div class="brand">🌊 大蓝海</div><div class="tag">为每一次坚持，找到一片蓝海</div></div>
+</section>
+
+<!-- Shot 2: 打卡 -->
+<section class="shot shot2" id="s2">
+  <div class="glow glow1"></div>
+  <div class="header">
+    <h1>每日打卡</h1>
+    <p>坚持，看得见</p>
+  </div>
+  <div class="content">
+    <div class="checkin-circle"><div class="checkin-mark">✓</div></div>
+    <div class="checkin-text">
+      <div class="big">今日已坚持</div>
+      <div class="small">连续打卡 12 天 · 距 21 天目标还差 9 天</div>
+    </div>
+  </div>
+  <div class="footer"><div class="brand">🌊 大蓝海</div><div class="tag">为每一次坚持，找到一片蓝海</div></div>
+</section>
+
+<!-- Shot 3: 21天 -->
+<section class="shot shot3" id="s3">
+  <div class="glow glow1"></div>
+  <div class="header">
+    <h1>连续 21 天</h1>
+    <p>征服属于你的岛屿</p>
+  </div>
+  <div class="content">
+    <div class="streak-num">21</div>
+    <div class="streak-label">天连续打卡</div>
+    <div class="grid21" id="g3"></div>
+  </div>
+  <div class="footer"><div class="brand">🌊 大蓝海</div><div class="tag">为每一次坚持，找到一片蓝海</div></div>
+</section>
+
+<!-- Shot 4: 证书 -->
+<section class="shot shot4" id="s4">
+  <div class="glow glow1"></div>
+  <div class="header">
+    <h1>征服证书</h1>
+    <p>分享你的成就</p>
+  </div>
+  <div class="content">
+    <div class="cert">
+      <div class="cert-badge">🏆</div>
+      <div class="cert-title">征服 清心岛</div>
+      <div class="cert-line"></div>
+      <div class="cert-sub">连续打卡 21 天达成</div>
+      <div class="cert-info">2026-07-24 · 大蓝海</div>
+    </div>
+  </div>
+  <div class="footer"><div class="brand">🌊 大蓝海</div><div class="tag">为每一次坚持，找到一片蓝海</div></div>
+</section>
+
+<!-- Shot 5: 数据 -->
+<section class="shot shot5" id="s5">
+  <div class="glow glow1"></div>
+  <div class="header">
+    <h1>记录每一次进步</h1>
+    <p>数据见证坚持</p>
+  </div>
+  <div class="content">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-num">86</div><div class="stat-label">累计打卡</div></div>
+      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-num">21</div><div class="stat-label">最长连续</div></div>
+      <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-num">3</div><div class="stat-label">征服证书</div></div>
+    </div>
+    <div style="width:100%;color:#fff;margin-top:20px">
+      <div style="display:flex;justify-content:space-between;font-size:28px;opacity:.85"><span>本月打卡率</span><span>78%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:78%"></div></div>
+    </div>
+    <div class="heatmap" id="hm5"></div>
+  </div>
+  <div class="footer"><div class="brand">🌊 大蓝海</div><div class="tag">为每一次坚持，找到一片蓝海</div></div>
+</section>
+
+<script>
+// 填充21天格子
+const g3=document.getElementById('g3');
+for(let i=0;i<21;i++){
+  const c=document.createElement('div');
+  c.className='grid-cell done'+(i===20?' today':'');
+  c.textContent=i+1;
+  g3.appendChild(c);
+}
+// 填充热力图
+const hm5=document.getElementById('hm5');
+for(let i=0;i<48;i++){
+  const c=document.createElement('div');
+  const r=Math.random();
+  c.className='heat-cell'+(r>.7?' l3':r>.4?' l2':r>.2?' l1':'');
+  hm5.appendChild(c);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "appId": "com.kaitengguan.dalanhai",
+  "appName": "大蓝海",
+  "webDir": ".",
+  "ios": {
+    "contentInset": "always",
+    "limitsNavigationsToAppBoundDomains": true
+  }
+}
