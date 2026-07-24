@@ -28,11 +28,6 @@ workflows:
       - name: Sync web code to iOS
         script: npx cap sync ios
 
-      - name: Set app version
-        script: |
-          cd ios/App
-          agvtool new_version -all 1
-
       - name: Build IPA
         script: |
           xcode-project build-ipa \
