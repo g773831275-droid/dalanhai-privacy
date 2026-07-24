@@ -7,12 +7,14 @@ workflows:
       vars:
         XCODE_VERSION: 15.4
         BUNDLE_ID: "com.kaitengguan.dalanghai"
-      # 签名配置：直接关联你上传的证书和描述文件
+      # 签名配置：Codemagic标准格式，已按你的信息填好
       ios_signing:
-        certificate: dalanhai
-        provisioning_profile: dalanhai
+        certificates:
+          - dalanhai
+        provisioning_profiles:
+          com.kaitengguan.dalanghai: dalanhai
     scripts:
-      # 1. 准备web目录，适配你没有css/js文件的情况
+      # 1. 准备web目录
       - name: Prepare web directory
         script: |
           mkdir -p www
@@ -34,7 +36,7 @@ workflows:
       - name: Sync Capacitor iOS
         script: |
           npx cap sync ios
-      # 5. 用你的Team ID和签名配置编译并打包IPA
+      # 5. 用你的Team ID编译并打包IPA
       - name: Build iOS Release
         script: |
           cd ios/App
