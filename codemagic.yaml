@@ -6,7 +6,7 @@ workflows:
     environment:
       vars:
         XCODE_VERSION: 15.4
-        BUNDLE_ID: "com.kaitengguan.dalanghai"  # 这里改成你苹果开发者后台的Bundle ID
+        BUNDLE_ID: "com.kaitengguan.dalanghai"
     scripts:
       - name: Install dependencies
         script: |
@@ -19,9 +19,3 @@ workflows:
           npx cap build ios --release
     artifacts:
       - ios/App/build/ios/ipa/*.ipa
-    publishing:
-      app_store_connect:
-        auth:
-          key_id: $APP_STORE_CONNECT_KEY_ID
-          issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-          private_key: $APP_STORE_CONNECT_PRIVATE_KEY
