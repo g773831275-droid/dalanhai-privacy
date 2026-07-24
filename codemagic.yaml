@@ -4,7 +4,7 @@ workflows:
     instance_type: mac_mini_m1
     max_build_duration: 40
     integrations:
-      app_store_connect: dalanhai_asc
+      app_store_connect: 大蓝海
     environment:
       vars:
         BUNDLE_ID: com.kaitengguan.dalanhai
