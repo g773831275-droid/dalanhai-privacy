@@ -60,3 +60,34 @@ workflows:
             -exportPath ./build/ipa
     artifacts:
       - ios/App/build/ipa/*.ipa
+- name: Build iOS Release
+  script: |
+    cd ios/App
+    # 创建导出配置文件，填入你的Team ID
+    cat > exportOptions.plist << 'EOF'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>method</key>
+      <string>app-store</string>
+      <key>teamID</key>
+      <string>5QLTMB4JGC</string>
+      <key>signingStyle</key>
+      <string>automatic</string>
+    </dict>
+    </plist>
+    EOF
+    # 编译归档，强制开启自动签名，拉取Codemagic的描述文件
+    xcodebuild archive \
+      -workspace App.xcworkspace \
+      -scheme App \
+      -configuration Release \
+      -archivePath ./build/App.xcarchive \
+      DEVELOPMENT_TEAM=5QLTMB4JGC \
+      -allowProvisioningUpdates
+    # 导出可上架的IPA文件
+    xcodebuild -exportArchive \
+      -archivePath ./build/App.xcarchive \
+      -exportOptionsPlist exportOptions.plist \
+      -exportPath ./build/ipa
