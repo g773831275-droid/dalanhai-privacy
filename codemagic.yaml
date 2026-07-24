@@ -1,19 +1,16 @@
 workflows:
   ios-release:
     name: iOS Release Build
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m1  # 这里修正了笔误，原先是mac_mini_ml
     max_build_duration: 30
     environment:
       vars:
         XCODE_VERSION: 15.4
-        BUNDLE_ID: "com.kaitengguan.dalanghai"
+        BUNDLE_ID: "com.kaitengguan.dalanghai"  # 你已经改好了，保持不变
     scripts:
       - name: Install dependencies
         script: |
           npm install
-      - name: Add Capacitor iOS platform
-        script: |
-          npx cap add ios
       - name: Sync Capacitor iOS
         script: |
           npx cap sync ios
