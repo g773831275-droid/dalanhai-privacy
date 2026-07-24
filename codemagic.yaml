@@ -30,9 +30,11 @@ workflows:
 
       - name: Build IPA
         script: |
+          printf '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n  <key>method</key>\n  <string>app-store</string>\n  <key>teamID</key>\n  <string>5QLTMB4JGC</string>\n  <key>uploadBitcode</key>\n  <false/>\n  <key>uploadSymbols</key>\n  <false/>\n  <key>compileBitcode</key>\n  <false/>\n</dict>\n</plist>\n' > export_options.plist
           xcode-project build-ipa \
             --workspace ios/App/App.xcworkspace \
-            --scheme App
+            --scheme App \
+            --export-options-plist export_options.plist
 
     artifacts:
       - build/ios/ipa/*.ipa
