@@ -32,5 +32,43 @@ workflows:
 
       - name: Sync web code to iOS
         script: npx cap sync ios
+
+      - name: Build and Archive iOS App
+        script: |
+          cd ios/App
+          mkdir -p build
+          # 创建导出配置文件
+          cat > exportOptions.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>teamID</key>
+            <string>5QLTMB4JGC</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+          </dict>
+          </plist>
+          EOF
+          # 编译归档，指定目标设备为通用iOS设备，强制开启自动签名
+          xcodebuild archive \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath ./build/App.xcarchive \
+            DEVELOPMENT_TEAM=5QLTMB4JGC \
+            -allowProvisioningUpdates
+          # 导出IPA文件
+          xcodebuild -exportArchive \
+            -archivePath ./build/App.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath ./build/ipa
+          # 把IPA复制到Codemagic的Artifacts目录，确保能被识别
+          mkdir -p $CM_BUILD_DIR/artifacts
+          cp ./build/ipa/*.ipa $CM_BUILD_DIR/artifacts/
+
     artifacts:
-      - ios/App/build/Release-iphoneos/*.ipa
+      - $CM_BUILD_DIR/artifacts/*.ipa
