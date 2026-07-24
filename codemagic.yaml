@@ -7,12 +7,8 @@ workflows:
       vars:
         XCODE_VERSION: 15.4
         BUNDLE_ID: "com.kaitengguan.dalanghai"
-      ios_signing:
-        certificates:
-          - dalanhai
-        provisioning_profiles:
-          com.kaitengguan.dalanghai: dalanhai
     scripts:
+      # 1. 准备web目录
       - name: Prepare web directory
         script: |
           mkdir -p www
@@ -22,18 +18,23 @@ workflows:
           if ls *.png 1> /dev/null 2>&1; then cp *.png www/; fi
           if ls *.jpg 1> /dev/null 2>&1; then cp *.jpg www/; fi
           if ls *.svg 1> /dev/null 2>&1; then cp *.svg www/; fi
+      # 2. 安装依赖
       - name: Install dependencies
         script: |
           npm install
+      # 3. 添加iOS平台
       - name: Add Capacitor iOS platform
         script: |
           npx cap add ios
+      # 4. 同步代码到iOS项目
       - name: Sync Capacitor iOS
         script: |
           npx cap sync ios
+      # 5. 用你的Team ID编译并打包IPA
       - name: Build iOS Release
         script: |
           cd ios/App
+          # 创建导出配置文件，填入你的Team ID
           cat > exportOptions.plist << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -48,12 +49,14 @@ workflows:
           </dict>
           </plist>
           EOF
+          # 编译归档，绑定你的Team ID
           xcodebuild archive \
             -workspace App.xcworkspace \
             -scheme App \
             -configuration Release \
             -archivePath ./build/App.xcarchive \
             DEVELOPMENT_TEAM=5QLTMB4JGC
+          # 导出可上架的IPA文件
           xcodebuild -exportArchive \
             -archivePath ./build/App.xcarchive \
             -exportOptionsPlist exportOptions.plist \
