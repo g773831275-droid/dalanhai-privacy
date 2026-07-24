@@ -8,20 +8,31 @@ workflows:
         XCODE_VERSION: 15.4
         BUNDLE_ID: "com.kaitengguan.dalanghai"
     scripts:
+      # 1. 安全创建并填充www文件夹（关键修改：先判断文件是否存在再复制）
       - name: Prepare web directory
         script: |
-          # 创建www文件夹，把所有前端文件复制进去
           mkdir -p www
-          cp -r index.html *.css *.js *.png *.jpg *.svg www/
+          # 复制index.html（必须文件，不存在会报错）
+          cp index.html www/
+          # 可选文件，不存在也不会报错
+          if ls *.css 1> /dev/null 2>&1; then cp *.css www/; fi
+          if ls *.js 1> /dev/null 2>&1; then cp *.js www/; fi
+          if ls *.png 1> /dev/null 2>&1; then cp *.png www/; fi
+          if ls *.jpg 1> /dev/null 2>&1; then cp *.jpg www/; fi
+          if ls *.svg 1> /dev/null 2>&1; then cp *.svg www/; fi
+      # 2. 安装依赖
       - name: Install dependencies
         script: |
           npm install
+      # 3. 添加iOS平台
       - name: Add Capacitor iOS platform
         script: |
           npx cap add ios
+      # 4. 同步代码到iOS项目
       - name: Sync Capacitor iOS
         script: |
           npx cap sync ios
+      # 5. 编译Release包
       - name: Build iOS Release
         script: |
           npx cap build ios --release
