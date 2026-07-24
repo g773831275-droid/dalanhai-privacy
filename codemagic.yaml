@@ -7,8 +7,11 @@ workflows:
       vars:
         XCODE_VERSION: 15.4
         BUNDLE_ID: "com.kaitengguan.dalanghai"
+      # 关键添加：关联签名文件
+      ios_signing:
+        certificate: dalanhai  # 你刚才起的证书名称
+        provisioning_profile: dalanhai  # 你刚才起的描述文件名称
     scripts:
-      # 1. 安全创建并填充www文件夹（适配你没有css/js文件的情况）
       - name: Prepare web directory
         script: |
           mkdir -p www
@@ -18,23 +21,19 @@ workflows:
           if ls *.png 1> /dev/null 2>&1; then cp *.png www/; fi
           if ls *.jpg 1> /dev/null 2>&1; then cp *.jpg www/; fi
           if ls *.svg 1> /dev/null 2>&1; then cp *.svg www/; fi
-      # 2. 安装依赖
       - name: Install dependencies
         script: |
           npm install
-      # 3. 添加iOS平台
       - name: Add Capacitor iOS platform
         script: |
           npx cap add ios
-      # 4. 同步代码到iOS项目
       - name: Sync Capacitor iOS
         script: |
           npx cap sync ios
-      # 5. 用Xcode原生命令编译Release版本（关键修改！替代cap build命令）
       - name: Build iOS Release
         script: |
           cd ios/App
-          # 先创建导出配置文件
+          # 创建导出配置文件，填入你的Team ID
           cat > exportOptions.plist << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -43,18 +42,20 @@ workflows:
             <key>method</key>
             <string>app-store</string>
             <key>teamID</key>
-            <string>YOUR_TEAM_ID</string>
+            <string>5QLTMB4JGC</string>
             <key>signingStyle</key>
             <string>automatic</string>
           </dict>
           </plist>
           EOF
-          # 编译并打包
+          # 编译归档，指定开发团队
           xcodebuild archive \
             -workspace App.xcworkspace \
             -scheme App \
             -configuration Release \
-            -archivePath ./build/App.xcarchive
+            -archivePath ./build/App.xcarchive \
+            DEVELOPMENT_TEAM=5QLTMB4JGC
+          # 导出IPA文件
           xcodebuild -exportArchive \
             -archivePath ./build/App.xcarchive \
             -exportOptionsPlist exportOptions.plist \
