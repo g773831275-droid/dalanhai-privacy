@@ -2,62 +2,35 @@ workflows:
   ios-release:
     name: iOS Release Build
     instance_type: mac_mini_m1
-    max_build_duration: 30
+    max_build_duration: 35
     environment:
       vars:
         XCODE_VERSION: 15.4
-        BUNDLE_ID: "com.kaitengguan.dalanghai"
+        BUNDLE_ID: com.kaitengguan.dalanhai
+        TEAM_ID: 5QLTMB4JGC
       ios_signing:
         certificates:
           - dalanhai
         provisioning_profiles:
           - dalanhai
     scripts:
-      - name: Prepare web directory
+      - name: Prepare web assets
         script: |
           mkdir -p www
           cp index.html www/
-          if ls *.css 1> /dev/null 2>&1; then cp *.css www/; fi
-          if ls *.js 1> /dev/null 2>&1; then cp *.js www/; fi
-          if ls *.png 1> /dev/null 2>&1; then cp *.png www/; fi
-          if ls *.jpg 1> /dev/null 2>&1; then cp *.jpg www/; fi
-          if ls *.svg 1> /dev/null 2>&1; then cp *.svg www/; fi
-      - name: Install dependencies
-        script: |
-          npm install
-      - name: Add Capacitor iOS platform
-        script: |
-          npx cap add ios
-      - name: Sync Capacitor iOS
-        script: |
-          npx cap sync ios
-      - name: Build iOS Release
-        script: |
-          cd ios/App
-          cat > exportOptions.plist << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store</string>
-            <key>teamID</key>
-            <string>5QLTMB4JGC</string>
-            <key>signingStyle</key>
-            <string>automatic</string>
-          </dict>
-          </plist>
-          EOF
-          xcodebuild archive \
-            -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -archivePath ./build/App.xcarchive \
-            DEVELOPMENT_TEAM=5QLTMB4JGC \
-            -allowProvisioningUpdates
-          xcodebuild -exportArchive \
-            -archivePath ./build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath ./build/ipa
+          [ -f *.css ] && cp *.css www/ || true
+          [ -f *.js ] && cp *.js www/ || true
+          [ -f *.png ] && cp *.png www/ || true
+          [ -f *.jpg ] && cp *.jpg www/ || true
+          [ -f *.svg ] && cp *.svg www/ || true
+
+      - name: Install npm dependencies
+        script: npm install
+
+      - name: Add iOS platform
+        script: npx cap add ios
+
+      - name: Sync web code to iOS
+        script: npx cap sync ios
     artifacts:
-      - ios/App/build/ipa/*.ipa
+      - ios/App/build/Release-iphoneos/*.ipa
