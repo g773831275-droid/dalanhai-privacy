@@ -11,7 +11,7 @@ workflows:
         certificates:
           - dalanhai
         provisioning_profiles:
-          com.kaitengguan.dalanghai: dalanhai
+          - dalanhai
     scripts:
       - name: Prepare web directory
         script: |
