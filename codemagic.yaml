@@ -33,7 +33,10 @@ workflows:
 
       - name: Build IPA
         script: |
-          printf '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n  <key>method</key>\n  <string>app-store</string>\n  <key>teamID</key>\n  <string>5QLTMB4JGC</string>\n  <key>uploadBitcode</key>\n  <false/>\n  <key>uploadSymbols</key>\n  <false/>\n  <key>compileBitcode</key>\n  <false/>\n</dict>\n</plist>\n' > export_options.plist
+          PP_NAME=$(xcodebuild -workspace ios/App/App.xcworkspace -scheme App -showBuildSettings 2>/dev/null | grep "PROVISIONING_PROFILE_SPECIFIER" | head -1 | awk -F'= ' '{print $2}' | tr -d ' \r')
+          if [ -z "$PP_NAME" ]; then PP_NAME="dalanhai"; fi
+          echo "Provisioning profile: $PP_NAME"
+          printf '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n  <key>method</key>\n  <string>app-store</string>\n  <key>teamID</key>\n  <string>5QLTMB4JGC</string>\n  <key>provisioningProfiles</key>\n  <dict>\n    <key>com.kaitengguan.dalanhai</key>\n    <string>%s</string>\n  </dict>\n  <key>signingCertificate</key>\n  <string>iPhone Distribution</string>\n  <key>uploadBitcode</key>\n  <false/>\n  <key>uploadSymbols</key>\n  <false/>\n  <key>compileBitcode</key>\n  <false/>\n</dict>\n</plist>\n' "$PP_NAME" > export_options.plist
           xcode-project build-ipa \
             --workspace ios/App/App.xcworkspace \
             --scheme App \
