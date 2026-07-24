@@ -30,6 +30,13 @@ workflows:
       - name: Sync web code to iOS
         script: npx cap sync ios
 
+      - name: Generate app icons
+        script: npx --yes @capacitor/assets generate --ios --assetPath .
+
+      - name: Set build number
+        script: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" ios/App/App/Info.plist
+
       - name: Declare no encryption
         script: |
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" ios/App/App/Info.plist 2>/dev/null || true
