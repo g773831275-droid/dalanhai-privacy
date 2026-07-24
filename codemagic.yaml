@@ -33,21 +33,43 @@ workflows:
       - name: Sync web code to iOS
         script: npx cap sync ios
 
-      - name: Build iOS App (Generate IPA)
+      - name: Build and Export IPA (无签名冲突版)
         script: |
           cd ios/App
-          # 用 Codemagic 内置签名配置编译，避免本地账号错误
-          xcodebuild \
+          mkdir -p build
+
+          # 编译并归档（只让Codemagic自动处理签名，不手动指定参数）
+          xcodebuild archive \
             -workspace App.xcworkspace \
             -scheme App \
             -configuration Release \
-            -sdk iphoneos \
-            -derivedDataPath ./build/DerivedData \
-            CONFIGURATION_BUILD_DIR=./build/Release-iphoneos \
-            DEVELOPMENT_TEAM=$TEAM_ID \
-            CODE_SIGN_IDENTITY="iPhone Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="$BUNDLE_ID"
+            -destination "generic/platform=iOS" \
+            -archivePath ./build/App.xcarchive \
+            -allowProvisioningUpdates
+
+          # 导出IPA文件（自动匹配你的Team ID和签名）
+          xcodebuild -exportArchive \
+            -archivePath ./build/App.xcarchive \
+            -exportOptionsPlist <(cat << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key>
+  <string>app-store</string>
+  <key>teamID</key>
+  <string>5QLTMB4JGC</string>
+  <key>signingStyle</key>
+  <string>automatic</string>
+</dict>
+</plist>
+EOF
+) \
+            -exportPath ./build/ipa
+
+          # 把IPA复制到Codemagic的标准产物目录，确保能被识别
+          mkdir -p $CM_BUILD_DIR/artifacts
+          cp ./build/ipa/*.ipa $CM_BUILD_DIR/artifacts/
 
     artifacts:
-      - ios/App/build/Release-iphoneos/*.ipa
-      - ios/App/build/DerivedData/Logs/Build/*.log
+      - $CM_BUILD_DIR/artifacts/*.ipa
