@@ -42,6 +42,17 @@ workflows:
         script: |
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" ios/App/App/Info.plist 2>/dev/null || true
 
+      - name: Lock orientation to portrait only
+        script: |
+          # iPhone: 只支持竖屏
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations" ios/App/App/Info.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations array" ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" ios/App/App/Info.plist
+          # iPad: 只支持竖屏 (iPad 默认支持横竖,需单独锁)
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations~ipad" ios/App/App/Info.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" ios/App/App/Info.plist
+
       - name: Set up code signing
         script: xcode-project use-profiles
 
