@@ -20,6 +20,7 @@ workflows:
           mkdir -p www
           cp index.html www/
           cp wechat-qr.jpg www/
+          cp support.html www/ 2>/dev/null || true
 
       - name: Add iOS platform
         script: |

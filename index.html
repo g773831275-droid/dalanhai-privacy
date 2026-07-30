@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Noto+Serif+SC:wght@600;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   :root{
@@ -52,7 +53,7 @@
   }
   #app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative;z-index:1;
        box-shadow:0 0 60px rgba(0,0,0,.6);}
-  .statusbar{height:env(safe-area-inset-top,20px)}
+  .statusbar{height:env(safe-area-inset-top,20px);background:#04101F}
 
   /* ============ 顶栏 ============ */
   .topbar{
@@ -64,6 +65,8 @@
              background:linear-gradient(180deg,#FFF3C4 0%,#E8B84A 55%,#8A5B14 100%);
              -webkit-background-clip:text;background-clip:text;color:transparent;
              text-shadow:0 1px 0 rgba(0,0,0,.4)}
+  .is-island-view .topbar > div{flex:1;text-align:center}
+  .is-island-view .topbar h1{text-align:center;width:100%;display:block}
   .topbar .sub{font-size:11px;color:var(--sub);letter-spacing:1px;margin-top:2px}
   .topbar .back{font-size:26px;color:var(--gold);cursor:pointer;width:34px;line-height:1;
                 text-shadow:0 0 8px rgba(232,184,74,.5)}
@@ -158,7 +161,8 @@
   }
   .detail-hero .ic{font-size:52px;margin-bottom:6px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))}
   .detail-hero h2{font-family:"Noto Serif SC",serif;font-size:22px;font-weight:800;letter-spacing:2px;
-                  background:linear-gradient(180deg,#FFF3C4,#E8B84A);-webkit-background-clip:text;background-clip:text;color:transparent}
+                  background:linear-gradient(180deg,#FFF3C4,#E8B84A);-webkit-background-clip:text;background-clip:text;color:transparent;
+                  text-align:center;display:block;width:100%}
   .detail-hero .slogan{font-size:12px;color:var(--foam);opacity:.85;margin-top:4px;letter-spacing:.5px}
   .streak-big{font-family:"Cinzel",serif;font-size:60px;font-weight:800;line-height:1;margin:16px 0 4px;
               background:linear-gradient(180deg,#FFF3C4,#E8B84A 60%,#B7702B);-webkit-background-clip:text;background-clip:text;color:transparent;
@@ -289,8 +293,67 @@
     background:linear-gradient(135deg,#F7D77A,#B7702B);color:#2A1A05;
     display:flex;align-items:center;justify-content:center;font-size:30px;
     box-shadow:0 6px 16px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.4);
-    border:2px solid rgba(232,184,74,.6);flex-shrink:0;
+    border:2px solid rgba(232,184,74,.6);flex-shrink:0;cursor:pointer;position:relative;
   }
+  .captain-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+  .captain-avatar .cam{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;
+    background:linear-gradient(180deg,#F7D77A,#B7702B);color:#2A1A05;font-size:11px;
+    display:flex;align-items:center;justify-content:center;border:2px solid #04101F;line-height:1}
+  .captain-name{cursor:pointer}
+  .captain-name .pen{font-size:12px;color:var(--gold);opacity:.65;margin-left:6px;font-weight:400}
+  .rename-hint{font-size:12px;margin-top:8px;min-height:18px;text-align:left;letter-spacing:.5px}
+  .rename-ok{color:var(--gold)}
+  .rename-err{color:var(--coral)}
+  /* 帖子详情 + 多图角标 */
+  .post{position:relative}
+  .img-count{position:absolute;left:8px;bottom:54px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:2px 7px;border-radius:10px}
+  .likes.liked{color:var(--coral)}
+  .pd{background:var(--card-solid);border-radius:14px;overflow:hidden;margin-bottom:14px}
+  .pd-carousel{position:relative;width:100%;overflow:hidden;background:#000}
+  .pd-track{display:flex;transition:transform .3s ease}
+  .pd-slide{min-width:100%}
+  .pd-slide img{width:100%;display:block;max-height:68vh;object-fit:contain}
+  .pd-dots{position:absolute;bottom:10px;left:0;right:0;display:flex;gap:6px;justify-content:center}
+  .pd-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer}
+  .pd-dot.on{background:var(--gold)}
+  .pd-nav{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
+  .pd-prev{left:8px}.pd-next{right:8px}
+  .pd-cover{height:280px;display:flex;align-items:center;justify-content:center}
+  .pd-cover .emoji{font-size:72px}
+  .pd-body{padding:14px 16px}
+  .pd-author{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .pd-ava{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#F7D77A,#B7702B);color:#2A1A05;display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0}
+  .pd-ava img{width:100%;height:100%;object-fit:cover}
+  .pd-name{font-size:14px;font-weight:500;color:var(--gold)}
+  .pd-ago{font-size:11px;color:var(--sub);margin-top:2px}
+  .pd-del{margin-left:auto;font-size:12px;color:var(--coral);cursor:pointer;padding:4px 8px;border:1px solid rgba(228,91,58,.3);border-radius:6px;flex-shrink:0}
+  .pd-del:active{background:rgba(228,91,58,.15)}
+  .pd-text{font-size:15px;line-height:1.7;margin-bottom:10px;color:#EAF2FF}
+  .pd-tags{margin-bottom:14px}
+  .pd-actions{display:flex;gap:24px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .pd-act{display:flex;align-items:center;gap:5px;font-size:14px;color:var(--sub);cursor:pointer}
+  .pd-act.on{color:var(--coral)}
+  .pd-act .pd-ico{font-size:18px}
+  .pd-cmts{margin-top:14px}
+  .pd-cmt-empty{text-align:center;color:var(--sub);font-size:13px;padding:24px 12px;line-height:1.8}
+  .pd-cmt-empty span{font-size:11px;opacity:.7}
+  /* 闹市群列表 */
+  .grp-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer}
+  .grp-avatar{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#123A6B,#0F6E56);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+  .grp-body{flex:1;min-width:0}
+  .grp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+  .grp-name{font-size:14px;font-weight:500;color:#EAF2FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .grp-time{font-size:11px;color:var(--sub);flex-shrink:0;margin-left:8px}
+  .grp-last{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .grp-badge{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--coral);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  /* 群聊 */
+  .grp-chat{padding:14px}
+  .grp-chat-info{text-align:center;font-size:12px;color:var(--sub);padding:8px 12px;background:var(--card);border-radius:10px;margin-bottom:20px}
+  .grp-chat-empty{text-align:center;color:#EAF2FF;font-size:16px;padding:40px 20px;line-height:2}
+  .grp-chat-empty .big{font-size:56px;display:block;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}
+  .grp-chat-empty span{font-size:13px;color:var(--sub)}
+  .grp-chat-tip{text-align:center;color:var(--gold);font-size:13px;padding:20px 16px;background:rgba(232,184,74,.08);border:1px dashed rgba(232,184,74,.3);border-radius:12px;line-height:1.8}
+  .grp-chat-tip span{font-size:11px;color:var(--sub)}
   .captain-name{font-family:"Noto Serif SC",serif;font-size:19px;font-weight:800;color:#F4FAFF;letter-spacing:1px}
   .captain-rank{font-family:"Cinzel",serif;font-size:11px;color:var(--gold);letter-spacing:2px;margin-top:2px}
   .captain-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
@@ -432,7 +495,7 @@
       <span class="pl">发布</span>
     </div>
     <div class="tab" data-tab="msg" onclick="switchTab('msg')">
-      <span class="ti">📜</span><span>消息</span>
+      <span class="ti"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/><path d="M5 13h2M17 13h2"/></svg></span><span>闹市</span>
     </div>
     <div class="tab" data-tab="captain" onclick="switchTab('captain')">
       <span class="ti">🧭</span><span>船长</span>
@@ -493,6 +556,16 @@
   </div>
 </div>
 
+<!-- 删帖确认 -->
+<div class="mask" id="maskDelPost">
+  <div class="modal">
+    <h3>删除航海日志</h3>
+    <p>删除后这条日志将从港口消失，且无法恢复。<br><strong>确定删除？</strong></p>
+    <button class="btn-primary" style="background:linear-gradient(180deg,#e97561,#a3311f);color:#fff" onclick="deletePost()">确认删除</button>
+    <button class="btn-ghost" onclick="closeMask('maskDelPost')">再想想</button>
+  </div>
+</div>
+
 <!-- 发帖 -->
 <div class="mask" id="maskCompose">
   <div class="modal composer">
@@ -512,6 +585,20 @@
   </div>
 </div>
 
+<!-- 改名 -->
+<div class="mask" id="maskRename">
+  <div class="modal composer">
+    <h3 style="text-align:left">✎ 修改船长代号</h3>
+    <p style="text-align:left;margin-bottom:12px;font-size:12px">2-24 字符 · 可用汉字、字母、数字、下划线(_)、短横线(-)</p>
+    <input class="input" id="renameInput" maxlength="24" placeholder="输入新的船长代号" oninput="onRenameInput()">
+    <div id="renameHint" class="rename-hint"></div>
+    <div class="row">
+      <button class="btn-ghost-gold" onclick="closeMask('maskRename')">取消</button>
+      <button class="btn-primary" id="renameConfirm" onclick="confirmRename()" disabled>确认修改</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ============ 数据 ============ */
 const ISLANDS=[
@@ -523,7 +610,7 @@ const ISLANDS=[
 
 const TARGET=21;
 const AD_MAKEUP_ENABLED=false; // 首版隐藏广告补签，接入真实广告SDK后再改true（否则App Store审核会被拒）
-let currentView={tab:'islands',island:null};
+let currentView={tab:'islands',island:null,postId:null,groupId:null};
 let composerImgs=[null,null,null];
 let composerTags=[];
 let authMode='phone'; // phone | email | password
@@ -589,12 +676,28 @@ function render(){
   const back=document.getElementById('backBtn');
   const topRight=document.getElementById('topRight');
   topRight.innerHTML='';
+  document.getElementById('app').classList.toggle('is-island-view', !!currentView.island);
 
   if(currentView.island){
     back.classList.remove('hidden');
     document.getElementById('topTitle').textContent=getIsland(currentView.island).name;
     document.getElementById('topSub').textContent='ON VOYAGE · '+streak(currentView.island)+' DAYS';
     c.innerHTML=renderIsland(currentView.island);
+    return;
+  }
+  if(currentView.postId){
+    back.classList.remove('hidden');
+    document.getElementById('topTitle').textContent='航海日志';
+    document.getElementById('topSub').textContent='LOG · 帖子详情';
+    c.innerHTML=renderPostDetail(currentView.postId);
+    return;
+  }
+  if(currentView.groupId){
+    back.classList.remove('hidden');
+    const g=GROUPS.find(x=>x.id===currentView.groupId);
+    document.getElementById('topTitle').textContent=g?g.name:'群聊';
+    document.getElementById('topSub').textContent=g?('CREW · '+g.count+' 名船员'):'CREW';
+    c.innerHTML=renderGroup(currentView.groupId);
     return;
   }
   back.classList.add('hidden');
@@ -607,9 +710,9 @@ function render(){
     document.getElementById('topSub').textContent='HARBOR · 与同海域的船员交换故事';
     c.innerHTML=renderPort();
   }else if(currentView.tab==='msg'){
-    document.getElementById('topTitle').textContent='消息';
-    document.getElementById('topSub').textContent='DISPATCH · 来自船务长与船队的信号';
-    c.innerHTML=renderMsg();
+    document.getElementById('topTitle').textContent='闹市';
+    document.getElementById('topSub').textContent='BAZAAR · 岛屿社群与同好酒馆';
+    c.innerHTML=renderBazaar();
   }else if(currentView.tab==='captain'){
     document.getElementById('topTitle').textContent='船长';
     document.getElementById('topSub').textContent='CAPTAIN · 你的航海身份';
@@ -708,20 +811,21 @@ function renderPort(){
   html+=`<div class="masonry">`;
   posts.forEach((p,i)=>{
     const ar=(i%3===0)?'3/4':(i%3===1)?'1/1':'4/5';
+    const coverSrc=(p.images&&p.images[0])||p.image;
     let cover='';
-    if(p.image){
-      cover=`<img class="cover" src="${p.image}" style="--ar:${ar}" alt="">`;
+    if(coverSrc){
+      cover=`<img class="cover" src="${coverSrc}" style="--ar:${ar}" alt="">${(p.images&&p.images.length>1)?`<span class="img-count">🖼 ${p.images.length}</span>`:''}`;
     }else{
       cover=`<div class="cover gradient" style="--ar:${ar};background:${p.bg||'linear-gradient(135deg,#123A6B,#0A1F3D)'}"><span class="emoji">${p.emoji||'⚓'}</span></div>`;
     }
-    html+=`<div class="post" onclick="toast('${p.author}','${p.text.replace(/'/g,"\\'")}')">
+    html+=`<div class="post" onclick="openPost('${p.id}')">
       ${cover}
       <div class="body">
         <div class="title">${p.text}</div>
         <div>${(p.tags||[]).map(t=>`<span class="post-tag">#${t}</span>`).join('')}</div>
         <div class="meta">
           <div class="author"><div class="avatar">${p.avatar}</div>${p.author}</div>
-          <div class="likes">♥ ${p.likes}</div>
+          <div class="likes ${p.liked?'liked':''}">♥ ${p.likes}</div>
         </div>
       </div>
     </div>`;
@@ -732,26 +836,51 @@ function renderPort(){
 function setPortFilter(f){portFilter=f;render()}
 
 function openComposer(){
-  composerImgs=[null,null,null];composerTags=[];
-  document.getElementById('composeText').value='';
-  const tags=['清心岛','戒烟岛','健身岛','早睡岛','日更','新船员','妙招'];
-  document.getElementById('composeTags').innerHTML=tags.map(t=>
-    `<span class="composer-tag" onclick="toggleTag(this,'${t}')">#${t}</span>`).join('');
-  refreshComposerImgs();
-  openMask('maskCompose');
+  toast('发布功能即将开放','后端接入后将支持发布航海日志，敬请期待');
 }
 function toggleTag(el,t){
   el.classList.toggle('on');
   if(composerTags.includes(t))composerTags=composerTags.filter(x=>x!==t);
   else composerTags.push(t);
 }
+function convertHeic(file,cb){
+  const isHeic=/heic|heif/i.test(file.type)||/\.(heic|heif)$/i.test(file.name);
+  if(!isHeic||typeof heic2any==='undefined'){cb(file);return;}
+  heic2any({blob:file,toType:'image/jpeg',quality:0.85}).then(blob=>{
+    cb(new File([blob],file.name.replace(/\.(heic|heif)$/i,'.jpg'),{type:'image/jpeg'}));
+  }).catch(()=>{cb(file);});
+}
+function compressImage(src,maxEdge,maxKB,cb){
+  const img=new Image();
+  img.onload=()=>{
+    let w=img.width,h=img.height;
+    if(w>h&&w>maxEdge){h=Math.round(h*maxEdge/w);w=maxEdge;}
+    else if(h>=w&&h>maxEdge){w=Math.round(w*maxEdge/h);h=maxEdge;}
+    const canvas=document.createElement('canvas');
+    canvas.width=w;canvas.height=h;
+    canvas.getContext('2d').drawImage(img,0,0,w,h);
+    let q=0.85;let url=canvas.toDataURL('image/jpeg',q);
+    let kb=Math.round(url.length*0.75/1024);
+    while(kb>maxKB&&q>0.3){q-=0.08;url=canvas.toDataURL('image/jpeg',q);kb=Math.round(url.length*0.75/1024);}
+    cb(url);
+  };
+  img.onerror=()=>cb(null);
+  img.src=src;
+}
 function pickImg(i){
-  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  const inp=document.createElement('input');inp.type='file';
+  inp.accept='image/jpeg,image/png,image/heic,image/heif,image/*';
   inp.onchange=e=>{
     const f=e.target.files[0];if(!f)return;
-    const r=new FileReader();
-    r.onload=ev=>{composerImgs[i]=ev.target.result;refreshComposerImgs();};
-    r.readAsDataURL(f);
+    if(f.size>20*1024*1024){toast('图片过大','请选择小于 20MB 的图片');return;}
+    convertHeic(f,f2=>{
+      const r=new FileReader();
+      r.onload=ev=>compressImage(ev.target.result,1920,2048,url=>{
+        if(!url){toast('读取失败','请换一张图片');return;}
+        composerImgs[i]=url;refreshComposerImgs();
+      });
+      r.readAsDataURL(f2);
+    });
   };
   inp.click();
 }
@@ -765,17 +894,18 @@ function refreshComposerImgs(){
 }
 function submitPost(){
   const text=document.getElementById('composeText').value.trim();
-  if(!text){toast('未填写内容','写点什么吧，哪怕一句');return;}
+  const images=composerImgs.filter(x=>x);
+  if(!text && !images.length){toast('未填写内容','写点什么，或至少传一张图');return;}
   const d=loadData();
-  const img=composerImgs.find(x=>x);
   const emojiPool=['⚓','🌊','🧭','🏴‍☠️','⛵','💪','🌙','🧘','🚭'];
   const bgPool=['linear-gradient(135deg,#123A6B,#4da6ff)','linear-gradient(135deg,#0F6E56,#2ecc9e)','linear-gradient(135deg,#3b2205,#e8b84a)','linear-gradient(135deg,#1a1550,#7a6be0)'];
   const post={
     id:'u'+Date.now(),
     author:(d.captain&&d.captain.name)||'匿名船员',
     avatar:(d.captain&&d.captain.name)?d.captain.name[0]:'匿',
-    text,tags:composerTags,likes:0,ago:'刚刚',
-    image:img||null,
+    avatarUrl:(d.captain&&d.captain.avatar)||null,
+    text,tags:composerTags,likes:0,liked:false,ago:'刚刚',comments:[],
+    images:images, image:images[0]||null,
     emoji:emojiPool[Math.floor(Math.random()*emojiPool.length)],
     bg:bgPool[Math.floor(Math.random()*bgPool.length)],
   };
@@ -785,21 +915,122 @@ function submitPost(){
   render();
 }
 
-/* ============ 消息 ============ */
-function renderMsg(){
+/* ============ 帖子详情 ============ */
+function openPost(id){currentView={tab:'port',island:null,postId:id,groupId:null};render();document.getElementById('content').scrollTop=0}
+function likePost(id){
+  const d=loadData();const p=d.posts.find(x=>x.id===id);if(!p)return;
+  if(p.liked){p.liked=false;p.likes--;}else{p.liked=true;p.likes++;}
+  saveData(d);render();
+}
+let _delPostId=null;
+function confirmDeletePost(id){_delPostId=id;openMask('maskDelPost')}
+function deletePost(){
+  if(!_delPostId)return;
   const d=loadData();
-  let html=`<div class="section-title">收件箱 · Dispatch</div>`;
-  d.msgs.forEach(m=>{
-    html+=`<div class="msg-item" onclick="toast('${m.name}','${m.last.replace(/'/g,"\\'")}')">
-      <div class="msg-avatar">${m.avatar}</div>
-      <div class="msg-body">
-        <div class="msg-head"><span class="msg-name">${m.name}</span><span class="msg-time">${m.time}</span></div>
-        <div class="msg-last">${m.last}</div>
+  d.posts=d.posts.filter(x=>x.id!==_delPostId);
+  saveData(d);
+  closeMask('maskDelPost');
+  const pid=_delPostId;_delPostId=null;
+  currentView={tab:'port',island:null,postId:null,groupId:null};
+  render();
+  toast('已删除','这条航海日志已从港口移除');
+}
+function renderPostDetail(id){
+  const d=loadData();const p=d.posts.find(x=>x.id===id);
+  if(!p)return '<div class="empty"><span class="big">🌊</span>帖子不存在或已被删除</div>';
+  const isMine=d.captain&&p.author===d.captain.name;
+  const imgs=(p.images&&p.images.length)?p.images:(p.image?[p.image]:[]);
+  let cover='';
+  if(imgs.length){
+    cover=`<div class="pd-carousel" id="pdCarousel" ontouchstart="pdTouchStart(event)" ontouchend="pdTouchEnd(event)">
+      <div class="pd-track" id="pdTrack">${imgs.map(src=>`<div class="pd-slide"><img src="${src}" alt=""></div>`).join('')}</div>
+      ${imgs.length>1?`<div class="pd-dots">${imgs.map((_,i)=>`<span class="pd-dot ${i===0?'on':''}" onclick="pdSlide(${i})"></span>`).join('')}</div>`:''}
+      ${imgs.length>1?`<div class="pd-nav pd-prev" onclick="pdSlide(-1)">‹</div><div class="pd-nav pd-next" onclick="pdSlide(1)">›</div>`:''}
+    </div>`;
+  }else{
+    cover=`<div class="pd-cover gradient" style="background:${p.bg||'linear-gradient(135deg,#123A6B,#0A1F3D)'}"><span class="emoji">${p.emoji||'⚓'}</span></div>`;
+  }
+  return `
+    <div class="pd">
+      ${cover}
+      <div class="pd-body">
+        <div class="pd-author"><div class="pd-ava">${p.avatarUrl?`<img src="${p.avatarUrl}" alt="">`:p.avatar}</div><div><div class="pd-name">${p.author}</div><div class="pd-ago">${p.ago} · ${p.island?getIsland(p.island).name:''}</div></div>${isMine?`<div class="pd-del" onclick="confirmDeletePost('${p.id}')">🗑 删除</div>`:''}</div>
+        <div class="pd-text">${p.text}</div>
+        <div class="pd-tags">${(p.tags||[]).map(t=>`<span class="post-tag">#${t}</span>`).join('')}</div>
+        <div class="pd-actions">
+          <div class="pd-act ${p.liked?'on':''}" onclick="likePost('${p.id}')"><span class="pd-ico">♥</span> ${p.likes}</div>
+          <div class="pd-act" onclick="toast('评论即将开放','后端接入后开放评论与回复')"><span class="pd-ico">💬</span> 评论</div>
+        </div>
+        <div class="pd-cmts">
+          <div class="pd-cmt-empty">💬 评论与回复功能即将开放<br><span>接入后端后将支持互动交流</span></div>
+        </div>
       </div>
-      ${m.badge?`<div class="msg-badge">${m.badge}</div>`:''}
+    </div>
+  `;
+}
+let _pdIdx=0,_pdStartX=0;
+function pdSlide(dir){
+  const track=document.getElementById('pdTrack');if(!track)return;
+  const n=track.children.length;if(!n)return;
+  if(dir===-1||dir===1){_pdIdx=(_pdIdx+dir+n)%n;}else{_pdIdx=dir;}
+  track.style.transform='translateX(-'+_pdIdx*100+'%)';
+  document.querySelectorAll('.pd-dot').forEach((d,i)=>d.classList.toggle('on',i===_pdIdx));
+}
+function pdTouchStart(e){_pdStartX=e.touches[0].clientX}
+function pdTouchEnd(e){const dx=e.changedTouches[0].clientX-_pdStartX;if(Math.abs(dx)>40)pdSlide(dx>0?-1:1);}
+
+/* ============ 消息 ============ */
+/* 闹市社群 */
+const GROUPS=[
+  {id:'g-qingxin',cat:'island',name:'清心岛 · 静水深流',avatar:'🧘',desc:'冥想 · 静心 · 同行',count:1284,badge:5,last:'铁锚：分享一段冥想音频',time:'2 分钟前'},
+  {id:'g-jieyan',cat:'island',name:'戒烟岛 · 无烟港',avatar:'🚭',desc:'戒烟 · 互助 · 坚持',count:892,badge:0,last:'南十字获得【坚持14天】徽章',time:'34 分钟前'},
+  {id:'g-jianshen',cat:'island',name:'健身岛 · 铁血船队',avatar:'💪',desc:'增肌 · 减脂 · 装备',count:2103,badge:12,last:'磐石：今天谁陪我练背？',time:'刚刚'},
+  {id:'g-zaoshui',cat:'island',name:'早睡岛 · 熄灯号',avatar:'🌙',desc:'早睡 · 规律 · 妙招',count:1567,badge:0,last:'雾岛航海士：22:47 熄灯成功',time:'1 小时前'},
+  {id:'g-emotion',cat:'club',name:'情感觉醒交流群',avatar:'💭',desc:'情感 · 觉察 · 成长',count:3456,badge:0,last:'向日葵：分享今天的觉察',time:'5 分钟前'},
+  {id:'g-ai',cat:'club',name:'AI 学习交流群',avatar:'🤖',desc:'AI · 工具 · 副业',count:5210,badge:0,last:'码农老张：推荐一个好用的工具',time:'8 分钟前'},
+];
+function fmtBadge(n){return n>99?'99+':(n>0?n:'');}
+function openGroup(id){currentView={tab:'msg',island:null,postId:null,groupId:id};render();document.getElementById('content').scrollTop=0}
+function renderBazaar(){
+  let html='';
+  const islands=GROUPS.filter(g=>g.cat==='island');
+  const clubs=GROUPS.filter(g=>g.cat==='club');
+  html+=`<div class="section-title">岛屿社群 · Island Crews</div>`;
+  islands.forEach(g=>{
+    const b=fmtBadge(g.badge);
+    html+=`<div class="grp-item" onclick="openGroup('${g.id}')">
+      <div class="grp-avatar">${g.avatar}</div>
+      <div class="grp-body">
+        <div class="grp-head"><span class="grp-name">${g.name}</span><span class="grp-time">${g.time}</span></div>
+        <div class="grp-last">${g.last}</div>
+      </div>
+      ${b?`<div class="grp-badge">${b}</div>`:''}
     </div>`;
   });
+  html+=`<div class="section-title">同好酒馆 · Taverns</div>`;
+  clubs.forEach(g=>{
+    const b=fmtBadge(g.badge);
+    html+=`<div class="grp-item" onclick="openGroup('${g.id}')">
+      <div class="grp-avatar">${g.avatar}</div>
+      <div class="grp-body">
+        <div class="grp-head"><span class="grp-name">${g.name}</span><span class="grp-time">${g.time}</span></div>
+        <div class="grp-last">${g.last}</div>
+      </div>
+      ${b?`<div class="grp-badge">${b}</div>`:''}
+    </div>`;
+  });
+  html+=`<div style="text-align:center;color:var(--sub);font-size:11px;margin:24px 0;letter-spacing:1px">社群聊天 · 接入后端后开放</div>`;
   return html;
+}
+function renderGroup(id){
+  const g=GROUPS.find(x=>x.id===id);if(!g)return '<div class="empty">群聊不存在</div>';
+  return `
+    <div class="grp-chat">
+      <div class="grp-chat-info">👥 ${g.count} 名船员 · ${g.desc}</div>
+      <div class="grp-chat-empty"><span class="big">${g.avatar}</span>欢迎来到 ${g.name}<br><span style="font-size:13px">船员们的聚集地</span></div>
+      <div class="grp-chat-tip">💬 群聊功能即将开放<br><span>接入后端后将支持实时聊天、发图、@提及</span></div>
+    </div>
+  `;
 }
 
 /* ============ 船长 ============ */
@@ -821,9 +1052,9 @@ function renderCaptain(){
     return `
       <div class="captain-hero">
         <div class="captain-row">
-          <div class="captain-avatar">${d.captain.name[0]||'⚓'}</div>
+          <div class="captain-avatar" onclick="changeAvatar()">${d.captain.avatar?`<img src="${d.captain.avatar}" alt="头像">`:(d.captain.name[0]||'⚓')}<span class="cam">📷</span></div>
           <div>
-            <div class="captain-name">${d.captain.name}</div>
+            <div class="captain-name" onclick="changeName()">${d.captain.name}<span class="pen">✎</span></div>
             <div class="captain-rank">RANK · ${certCount>=2?'GRAND ADMIRAL 大提督':certCount>=1?'CAPTAIN 船长':'FIRST MATE 大副'}</div>
           </div>
         </div>
@@ -849,15 +1080,14 @@ function renderCaptain(){
     <div class="captain-hero" style="text-align:center;padding:28px 20px">
       <div style="font-size:56px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));margin-bottom:6px">🧭</div>
       <div class="captain-name" style="font-size:20px">登船 · 领取你的船长证</div>
-      <div style="font-size:12px;color:var(--sub);margin-top:6px;letter-spacing:1px">选择一种方式登船，同步你的航海记录</div>
+      <div style="font-size:12px;color:var(--sub);margin-top:6px;letter-spacing:1px">账号系统即将开放，敬请期待</div>
     </div>
-    <div class="auth-tabs">
-      <div class="auth-tab ${authMode==='phone'?'active':''}" onclick="setAuthMode('phone')">📱 手机验证码</div>
-      <div class="auth-tab ${authMode==='email'?'active':''}" onclick="setAuthMode('email')">✉️ 邮箱</div>
-      <div class="auth-tab ${authMode==='password'?'active':''}" onclick="setAuthMode('password')">🔑 账号密码</div>
+    <div style="text-align:center;padding:32px 20px;margin:0 14px;background:var(--card);border:1px solid var(--line);border-radius:14px">
+      <div style="font-size:40px;margin-bottom:10px">⛵</div>
+      <div style="font-size:15px;color:var(--gold);margin-bottom:8px">登录 / 注册功能开发中</div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.8">手机验证码、邮箱、账号密码登录<br>将在后端接入后开放<br><span style="color:var(--gold);opacity:.7">当前版本为本地体验版，数据仅存本机</span></div>
     </div>
-    <div id="authForm">${renderAuthForm()}</div>
-    <div class="auth-tip">登船即表示同意 <a onclick="toast('用户协议','用户协议将在正式版展示')">《大蓝海航海守则》</a></div>
+    <div class="auth-tip">当前为本地体验版 · 登录功能即将上线</div>
   `;
 }
 
@@ -939,12 +1169,116 @@ function doAuth(type){
   const d=loadData();
   d.captain={name,loginBy:type,at:Date.now()};
   saveData(d);
+  const used=JSON.parse(localStorage.getItem('dalanhai_used_names')||'[]');
+  if(!used.some(n=>n.toLowerCase()===name.toLowerCase())){used.push(name);localStorage.setItem('dalanhai_used_names',JSON.stringify(used));}
   toast('登船成功','欢迎回来，'+name);
   render();
 }
 function logout(){
   const d=loadData();d.captain=null;saveData(d);
   toast('已离船','下次登录时航海记录会自动恢复');
+  render();
+}
+
+/* ============ 头像 / 改名 ============ */
+const RESERVED_NAMES=['admin','root','system','test','user','administrator','superuser','operator','null','undefined','guest','anonymous','official','dalanhai','grandblue','船长','管理员','系统'];
+
+function changeAvatar(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/jpeg,image/png';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    if(f.size>8*1024*1024){toast('图片过大','请选择小于 8MB 的图片');return;}
+    compressAvatar(f,dataUrl=>{
+      const d=loadData();
+      if(!d.captain)d.captain={name:'船长',loginBy:'local',at:Date.now()};
+      d.captain.avatar=dataUrl;saveData(d);
+      render();
+      toast('头像已更新','已裁剪为正方形并压缩到小尺寸');
+    });
+  };
+  inp.click();
+}
+function compressAvatar(file,cb){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const srcSize=Math.min(img.width,img.height);
+      const sx=(img.width-srcSize)/2,sy=(img.height-srcSize)/2;
+      const OUT=256;const canvas=document.createElement('canvas');
+      canvas.width=OUT;canvas.height=OUT;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,sx,sy,srcSize,srcSize,0,0,OUT,OUT);
+      let q=0.82;let dataUrl=canvas.toDataURL('image/jpeg',q);
+      let bytes=Math.round(dataUrl.length*0.75);
+      while(bytes>100*1024&&q>0.3){q-=0.08;dataUrl=canvas.toDataURL('image/jpeg',q);bytes=Math.round(dataUrl.length*0.75);}
+      cb(dataUrl);
+    };
+    img.onerror=()=>toast('图片读取失败','请换一张图片');
+    img.src=e.target.result;
+  };
+  convertHeic(file,f2=>reader.readAsDataURL(f2));
+}
+
+function changeName(){
+  const d=loadData();
+  document.getElementById('renameInput').value=d.captain?d.captain.name:'';
+  document.getElementById('renameHint').textContent='';
+  document.getElementById('renameHint').className='rename-hint';
+  document.getElementById('renameConfirm').disabled=true;
+  openMask('maskRename');
+  setTimeout(()=>document.getElementById('renameInput').focus(),120);
+}
+function validateName(name){
+  if(!name)return {ok:false,msg:'代号不能为空'};
+  const len=[...name].length;
+  if(len<2)return {ok:false,msg:'代号至少 2 个字符'};
+  if(len>24)return {ok:false,msg:'代号最多 24 个字符'};
+  if(!/^[\u4e00-\u9fa5a-zA-Z0-9_-]+$/.test(name))return {ok:false,msg:'仅允许汉字、字母、数字、_、-'};
+  if(RESERVED_NAMES.includes(name.toLowerCase()))return {ok:false,msg:'该代号被系统保留，请换一个'};
+  return {ok:true,msg:'格式正确'};
+}
+async function checkNameUnique(name){
+  // 本地模拟版：检查本机已注册用户名。
+  // 接后端时换成：const r=await fetch('/api/check-name?n='+encodeURIComponent(name));return (await r.json()).available;
+  const used=JSON.parse(localStorage.getItem('dalanhai_used_names')||'[]');
+  const d=loadData();
+  const mine=d.captain?d.captain.name.toLowerCase():'';
+  if(name.toLowerCase()===mine)return true;
+  return !used.some(n=>n.toLowerCase()===name.toLowerCase());
+}
+let _renameTimer=null;
+function onRenameInput(){
+  const v=document.getElementById('renameInput').value.trim();
+  const hint=document.getElementById('renameHint');
+  const btn=document.getElementById('renameConfirm');
+  const r=validateName(v);
+  if(!r.ok){hint.textContent=r.msg;hint.className='rename-hint rename-err';btn.disabled=true;return;}
+  hint.textContent='检查唯一性…';hint.className='rename-hint';btn.disabled=true;
+  clearTimeout(_renameTimer);
+  _renameTimer=setTimeout(async()=>{
+    if(document.getElementById('renameInput').value.trim()!==v)return;
+    const ok=await checkNameUnique(v);
+    if(document.getElementById('renameInput').value.trim()!==v)return;
+    if(ok){hint.textContent='✓ 该代号可用';hint.className='rename-hint rename-ok';btn.disabled=false;}
+    else{hint.textContent='× 该代号已被占用';hint.className='rename-hint rename-err';btn.disabled=true;}
+  },350);
+}
+function confirmRename(){
+  const v=document.getElementById('renameInput').value.trim();
+  const r=validateName(v);if(!r.ok){toast('代号不合规',r.msg);return;}
+  const d=loadData();
+  if(!d.captain)d.captain={name:v,loginBy:'local',at:Date.now()};
+  const used=JSON.parse(localStorage.getItem('dalanhai_used_names')||'[]');
+  if(d.captain.name){
+    const idx=used.findIndex(n=>n.toLowerCase()===d.captain.name.toLowerCase());
+    if(idx>=0)used.splice(idx,1);
+  }
+  if(!used.some(n=>n.toLowerCase()===v.toLowerCase()))used.push(v);
+  localStorage.setItem('dalanhai_used_names',JSON.stringify(used));
+  d.captain.name=v;saveData(d);
+  closeMask('maskRename');
+  toast('代号已更新','欢迎，'+v);
   render();
 }
 
