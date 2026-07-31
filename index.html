@@ -337,6 +337,14 @@
   .pd-cmts{margin-top:14px}
   .pd-cmt-empty{text-align:center;color:var(--sub);font-size:13px;padding:24px 12px;line-height:1.8}
   .pd-cmt-empty span{font-size:11px;opacity:.7}
+  .pd-cmt{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .pd-cmt-ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#F7D77A,#B7702B);color:#2A1A05;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+  .pd-cmt-name{font-size:12px;color:var(--gold);margin-bottom:2px}
+  .pd-cmt-text{font-size:14px;color:#EAF2FF;line-height:1.5}
+  .pd-cmt-input-bar{display:none;gap:8px;padding:10px 0 4px}
+  .pd-cmt-input{flex:1;padding:10px 14px;border-radius:18px;background:rgba(0,0,0,.35);border:1px solid rgba(125,196,255,.2);color:#fff;font-size:14px;outline:none;font-family:inherit}
+  .pd-cmt-input:focus{border-color:rgba(232,184,74,.6)}
+  .pd-cmt-send{padding:0 16px;border-radius:18px;background:linear-gradient(180deg,#F7D77A,#B7702B);color:#2A1A05;font-size:13px;font-weight:700;border:none;cursor:pointer;flex-shrink:0}
   /* 闹市群列表 */
   .grp-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer}
   .grp-avatar{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#123A6B,#0F6E56);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
@@ -354,6 +362,19 @@
   .grp-chat-empty span{font-size:13px;color:var(--sub)}
   .grp-chat-tip{text-align:center;color:var(--gold);font-size:13px;padding:20px 16px;background:rgba(232,184,74,.08);border:1px dashed rgba(232,184,74,.3);border-radius:12px;line-height:1.8}
   .grp-chat-tip span{font-size:11px;color:var(--sub)}
+  /* 群聊消息列表 */
+  .gc-list{padding:0 0 16px;display:flex;flex-direction:column;gap:12px}
+  .gc-sys{text-align:center;font-size:11px;color:var(--sub);padding:6px 12px;background:var(--card);border-radius:8px;margin:0 auto;max-width:80%}
+  .gc-msg{display:flex;gap:8px;align-items:flex-start}
+  .gc-msg.mine{flex-direction:row-reverse}
+  .gc-ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F7D77A,#B7702B);color:#2A1A05;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+  .gc-bubble{max-width:72%;padding:9px 13px;border-radius:14px;font-size:14px;line-height:1.5;background:var(--card-solid);border:1px solid var(--line);color:#EAF2FF}
+  .gc-msg.mine .gc-bubble{background:linear-gradient(135deg,#123A6B,#1E5C99);border-color:rgba(125,196,255,.3)}
+  .gc-name{font-size:11px;color:var(--gold);margin-bottom:3px}
+  .gc-input-bar{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 0;background:linear-gradient(180deg,transparent,#04101F 30%)}
+  .gc-input{flex:1;padding:11px 14px;border-radius:18px;background:rgba(0,0,0,.35);border:1px solid rgba(125,196,255,.2);color:#fff;font-size:14px;outline:none;font-family:inherit}
+  .gc-input:focus{border-color:rgba(232,184,74,.6)}
+  .gc-send{padding:0 18px;border-radius:18px;background:linear-gradient(180deg,#F7D77A,#B7702B);color:#2A1A05;font-size:13px;font-weight:700;border:none;cursor:pointer;flex-shrink:0}
   .captain-name{font-family:"Noto Serif SC",serif;font-size:19px;font-weight:800;color:#F4FAFF;letter-spacing:1px}
   .captain-rank{font-family:"Cinzel",serif;font-size:11px;color:var(--gold);letter-spacing:2px;margin-top:2px}
   .captain-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
@@ -566,6 +587,16 @@
   </div>
 </div>
 
+<!-- 重置本地数据确认 -->
+<div class="mask" id="maskResetLocal">
+  <div class="modal">
+    <h3>重置本地数据</h3>
+    <p>确定重置所有本地数据？打卡记录、证书、发布的帖子都将清除，且无法恢复。<br><strong>此操作不可撤销，确定继续？</strong></p>
+    <button class="btn-primary" style="background:linear-gradient(180deg,#e97561,#a3311f);color:#fff" onclick="doResetLocal()">确认重置</button>
+    <button class="btn-ghost" onclick="closeMask('maskResetLocal')">再想想</button>
+  </div>
+</div>
+
 <!-- 发帖 -->
 <div class="mask" id="maskCompose">
   <div class="modal composer">
@@ -754,7 +785,7 @@ function renderIslands(){
       <div class="island-streak">${s}<small>D</small></div>
     </div>`;
   });
-  html+=`<div class="create-card" onclick="toast('开辟新航线','自定义岛屿功能正在筹备，敬请期待')">＋ 开辟新航线（申请岛主）</div>`;
+  html+=`<div class="create-card" onclick="toast('开辟新航线','自定义岛屿功能即将上线，关注后续版本')">＋ 开辟新航线（申请岛主）</div>`;
   return html;
 }
 
@@ -836,7 +867,13 @@ function renderPort(){
 function setPortFilter(f){portFilter=f;render()}
 
 function openComposer(){
-  toast('发布功能即将开放','后端接入后将支持发布航海日志，敬请期待');
+  composerImgs=[null,null,null];composerTags=[];
+  document.getElementById('composeText').value='';
+  const tags=['清心岛','戒烟岛','健身岛','早睡岛','日更','新船员','妙招'];
+  document.getElementById('composeTags').innerHTML=tags.map(t=>
+    `<span class="composer-tag" onclick="toggleTag(this,'${t}')">#${t}</span>`).join('');
+  refreshComposerImgs();
+  openMask('maskCompose');
 }
 function toggleTag(el,t){
   el.classList.toggle('on');
@@ -901,8 +938,8 @@ function submitPost(){
   const bgPool=['linear-gradient(135deg,#123A6B,#4da6ff)','linear-gradient(135deg,#0F6E56,#2ecc9e)','linear-gradient(135deg,#3b2205,#e8b84a)','linear-gradient(135deg,#1a1550,#7a6be0)'];
   const post={
     id:'u'+Date.now(),
-    author:(d.captain&&d.captain.name)||'匿名船员',
-    avatar:(d.captain&&d.captain.name)?d.captain.name[0]:'匿',
+    author:(d.captain&&d.captain.name)||'航海家',
+    avatar:(d.captain&&d.captain.name)?d.captain.name[0]:'航',
     avatarUrl:(d.captain&&d.captain.avatar)||null,
     text,tags:composerTags,likes:0,liked:false,ago:'刚刚',comments:[],
     images:images, image:images[0]||null,
@@ -921,6 +958,25 @@ function likePost(id){
   const d=loadData();const p=d.posts.find(x=>x.id===id);if(!p)return;
   if(p.liked){p.liked=false;p.likes--;}else{p.liked=true;p.likes++;}
   saveData(d);render();
+}
+function renderCmtList(p){
+  const cmts=p.comments||[];
+  if(!cmts.length)return '<div class="pd-cmt-empty">💬 暂无评论</div>';
+  return cmts.map(c=>`<div class="pd-cmt"><div class="pd-cmt-ava">${c.avatar||'航'}</div><div><div class="pd-cmt-name">${c.name}</div><div class="pd-cmt-text">${c.text}</div></div></div>`).join('');
+}
+function toggleComment(){
+  const bar=document.getElementById('pdCmtBar');if(!bar)return;
+  bar.style.display=bar.style.display==='none'?'flex':'none';
+  if(bar.style.display==='flex'){const inp=document.getElementById('pdCmtText');if(inp)inp.focus();}
+}
+function submitComment(pid){
+  const inp=document.getElementById('pdCmtText');if(!inp)return;
+  const text=inp.value.trim();if(!text)return;
+  const d=loadData();const p=d.posts.find(x=>x.id===pid);if(!p)return;
+  if(!p.comments)p.comments=[];
+  p.comments.push({name:'航海家',avatar:'航',text:text,time:Date.now()});
+  saveData(d);render();
+  setTimeout(()=>{const bar=document.getElementById('pdCmtBar');if(bar){bar.style.display='flex';const list=document.getElementById('pdCmtList');if(list)list.scrollTop=list.scrollHeight;}},50);
 }
 let _delPostId=null;
 function confirmDeletePost(id){_delPostId=id;openMask('maskDelPost')}
@@ -959,10 +1015,14 @@ function renderPostDetail(id){
         <div class="pd-tags">${(p.tags||[]).map(t=>`<span class="post-tag">#${t}</span>`).join('')}</div>
         <div class="pd-actions">
           <div class="pd-act ${p.liked?'on':''}" onclick="likePost('${p.id}')"><span class="pd-ico">♥</span> ${p.likes}</div>
-          <div class="pd-act" onclick="toast('评论即将开放','后端接入后开放评论与回复')"><span class="pd-ico">💬</span> 评论</div>
+          <div class="pd-act" onclick="toggleComment()"><span class="pd-ico">💬</span> ${(p.comments&&p.comments.length)||'评论'}</div>
         </div>
         <div class="pd-cmts">
-          <div class="pd-cmt-empty">💬 评论与回复功能即将开放<br><span>接入后端后将支持互动交流</span></div>
+          <div id="pdCmtList">${renderCmtList(p)}</div>
+          <div class="pd-cmt-input-bar" id="pdCmtBar">
+            <input class="pd-cmt-input" id="pdCmtText" placeholder="说点什么..." onkeydown="if(event.key==='Enter')submitComment('${p.id}')">
+            <button class="pd-cmt-send" onclick="submitComment('${p.id}')">发送</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1019,75 +1079,122 @@ function renderBazaar(){
       ${b?`<div class="grp-badge">${b}</div>`:''}
     </div>`;
   });
-  html+=`<div style="text-align:center;color:var(--sub);font-size:11px;margin:24px 0;letter-spacing:1px">社群聊天 · 接入后端后开放</div>`;
+  html+=`<div style="text-align:center;color:var(--sub);font-size:11px;margin:24px 0;letter-spacing:1px">点击群名进入社群 · 与船员们交流</div>`;
   return html;
 }
 function renderGroup(id){
   const g=GROUPS.find(x=>x.id===id);if(!g)return '<div class="empty">群聊不存在</div>';
+  const d=loadData();
+  const msgs=(d.groupMsgs&&d.groupMsgs[id])||SEED_GROUP_MSGS[id]||[];
+  let msgHtml='';
+  msgs.forEach(m=>{
+    if(m.sys){
+      msgHtml+=`<div class="gc-sys">${m.text}</div>`;
+    }else if(m.mine){
+      msgHtml+=`<div class="gc-msg mine"><div class="gc-bubble">${m.text}</div><div class="gc-ava">航</div></div>`;
+    }else{
+      msgHtml+=`<div class="gc-msg"><div class="gc-ava">${m.avatar||'船'}</div><div class="gc-bubble"><div class="gc-name">${m.name}</div>${m.text}</div></div>`;
+    }
+  });
   return `
-    <div class="grp-chat">
+    <div class="grp-chat" id="grpChatBox">
       <div class="grp-chat-info">👥 ${g.count} 名船员 · ${g.desc}</div>
-      <div class="grp-chat-empty"><span class="big">${g.avatar}</span>欢迎来到 ${g.name}<br><span style="font-size:13px">船员们的聚集地</span></div>
-      <div class="grp-chat-tip">💬 群聊功能即将开放<br><span>接入后端后将支持实时聊天、发图、@提及</span></div>
+      <div class="gc-list">${msgHtml}</div>
+      <div class="gc-input-bar">
+        <input class="gc-input" id="gcInput" placeholder="说点什么..." onkeydown="if(event.key==='Enter')sendGroupMsg('${id}')">
+        <button class="gc-send" onclick="sendGroupMsg('${id}')">发送</button>
+      </div>
     </div>
   `;
 }
+function sendGroupMsg(gid){
+  const inp=document.getElementById('gcInput');if(!inp)return;
+  const text=inp.value.trim();if(!text)return;
+  const d=loadData();
+  if(!d.groupMsgs)d.groupMsgs={};
+  if(!d.groupMsgs[gid])d.groupMsgs[gid]=(SEED_GROUP_MSGS[gid]||[]).slice();
+  d.groupMsgs[gid].push({mine:true,text:text,name:'航海家'});
+  saveData(d);
+  render();
+  setTimeout(()=>{const box=document.getElementById('grpChatBox');if(box)box.scrollTop=box.scrollHeight;},50);
+}
+const SEED_GROUP_MSGS={
+  'g-qingxin':[
+    {sys:true,text:'铁锚 邀请你加入清心岛 · 静水深流'},
+    {name:'铁锚',avatar:'铁',text:'分享一段冥想音频，今晚 22:00 一起静心 🧘'},
+    {name:'磐石',avatar:'磐',text:'第 7 天打卡，感觉心越来越静了'},
+    {name:'雾岛',avatar:'雾',text:'新人报到，求带！'}
+  ],
+  'g-jieyan':[
+    {sys:true,text:'南十字 邀请你加入戒烟岛 · 无烟港'},
+    {name:'南十字',avatar:'南',text:'戒烟第 14 天，抽屉那包烟两周没动了 🚭'},
+    {name:'旧日水兵',avatar:'旧',text:'今天又忍住了一根，加油兄弟们'}
+  ],
+  'g-jianshen':[
+    {sys:true,text:'磐石 邀请你加入健身岛 · 铁血船队'},
+    {name:'磐石',avatar:'磐',text:'今天谁陪我练背？pull-up 8×5 💪'},
+    {name:'黑帆船长',avatar:'黑',text:'深蹲 5×10 完成，海风很咸肌肉很鼓'}
+  ],
+  'g-zaoshui':[
+    {sys:true,text:'雾岛航海士 邀请你加入早睡岛 · 熄灯号'},
+    {name:'雾岛航海士',avatar:'雾',text:'22:47 熄灯，明早的太阳等我 🌙'},
+    {name:'远洋日志',avatar:'远',text:'手机丢客厅，卧室只留纸质书，这招真好用'}
+  ],
+  'g-emotion':[
+    {sys:true,text:'向日葵 邀请你加入情感觉醒交流群'},
+    {name:'向日葵',avatar:'向',text:'分享今天的觉察：情绪来了先停 3 秒'},
+    {name:'深海',avatar:'深',text:'最近在练非暴力沟通，很有启发'}
+  ],
+  'g-ai':[
+    {sys:true,text:'码农老张 邀请你加入 AI 学习交流群'},
+    {name:'码农老张',avatar:'码',text:'推荐一个好用的 AI 工具，效率翻倍 🤖'},
+    {name:'极客',avatar:'极',text:'最近在学 prompt engineering，一起交流'}
+  ]
+};
 
 /* ============ 船长 ============ */
 function renderCaptain(){
   const d=loadData();
-  if(d.captain){
-    let totalCheckins=0;ISLANDS.forEach(i=>totalCheckins+=totalDays(i.id));
-    const maxStreak=Math.max(0,...ISLANDS.map(i=>streak(i.id)));
-    const certCount=d.certificates.length;
-    let certs='';
-    if(certCount){
-      d.certificates.forEach(c=>{
-        const is=getIsland(c.island);
-        certs+=`<div class="cert-card"><div class="ct">🏴‍☠️ 征服 ${is.name}</div><div class="cd">连续打卡 ${TARGET} 天 · ${c.date}</div></div>`;
-      });
-    }else{
-      certs=`<div class="empty" style="padding:24px 12px"><span class="big">🏴‍☠️</span>还没有征服证书<br>连续 21 天登岛即可获得</div>`;
-    }
-    return `
-      <div class="captain-hero">
-        <div class="captain-row">
-          <div class="captain-avatar" onclick="changeAvatar()">${d.captain.avatar?`<img src="${d.captain.avatar}" alt="头像">`:(d.captain.name[0]||'⚓')}<span class="cam">📷</span></div>
-          <div>
-            <div class="captain-name" onclick="changeName()">${d.captain.name}<span class="pen">✎</span></div>
-            <div class="captain-rank">RANK · ${certCount>=2?'GRAND ADMIRAL 大提督':certCount>=1?'CAPTAIN 船长':'FIRST MATE 大副'}</div>
-          </div>
-        </div>
-        <div class="captain-stats">
-          <div class="cstat"><div class="n">${totalCheckins}</div><div class="l">累计打卡</div></div>
-          <div class="cstat"><div class="n">${maxStreak}</div><div class="l">最长连续</div></div>
-          <div class="cstat"><div class="n">${certCount}</div><div class="l">征服证书</div></div>
+  // 首版无登录: 未登录时用默认本地船长 "航海家", 直接展示档案(不显示"登录/开发中")
+  if(!d.captain){
+    d.captain={name:'航海家',loginBy:'local',at:Date.now()};
+    saveData(d);
+  }
+  let totalCheckins=0;ISLANDS.forEach(i=>totalCheckins+=totalDays(i.id));
+  const maxStreak=Math.max(0,...ISLANDS.map(i=>streak(i.id)));
+  const certCount=d.certificates.length;
+  let certs='';
+  if(certCount){
+    d.certificates.forEach(c=>{
+      const is=getIsland(c.island);
+      certs+=`<div class="cert-card"><div class="ct">🏴‍☠️ 征服 ${is.name}</div><div class="cd">连续打卡 ${TARGET} 天 · ${c.date}</div></div>`;
+    });
+  }else{
+    certs=`<div class="empty" style="padding:24px 12px"><span class="big">🏴‍☠️</span>还没有征服证书<br>连续 21 天登岛即可获得</div>`;
+  }
+  return `
+    <div class="captain-hero">
+      <div class="captain-row">
+        <div class="captain-avatar" onclick="changeAvatar()">${d.captain.avatar?`<img src="${d.captain.avatar}" alt="头像">`:(d.captain.name[0]||'⚓')}<span class="cam">📷</span></div>
+        <div>
+          <div class="captain-name" onclick="changeName()">${d.captain.name}<span class="pen">✎</span></div>
+          <div class="captain-rank">RANK · ${certCount>=2?'GRAND ADMIRAL 大提督':certCount>=1?'CAPTAIN 船长':'FIRST MATE 大副'}</div>
         </div>
       </div>
-      <div class="section-title">征服证书 · Certificates</div>
-      ${certs}
-      <div class="section-title">船员服务 · Services</div>
-      <div class="list-item" onclick="openService()"><span class="li-ic">💬</span><span class="li-text">联系船务长 · 进官方船队</span><span class="li-arrow">›</span></div>
-      <div class="list-item" onclick="toast('打卡提醒','推送提醒即将上线')"><span class="li-ic">🔔</span><span class="li-text">打卡提醒</span><span class="li-arrow">›</span></div>
-      <div class="list-item" onclick="toast('隐私政策','请在 App 上线后查看完整隐私政策')"><span class="li-ic">🔒</span><span class="li-text">隐私政策</span><span class="li-arrow">›</span></div>
-      <div class="list-item" onclick="logout()"><span class="li-ic">🚪</span><span class="li-text">退出登录</span><span class="li-arrow">›</span></div>
-      <div class="list-item" onclick="confirmDelete()"><span class="li-ic">🗑️</span><span class="li-text">弃船离港（注销账号）</span><span class="li-arrow">›</span></div>
-      <div style="text-align:center;color:var(--sub);font-size:11px;margin-top:24px;letter-spacing:2px">GRAND BLUE · V1.2</div>
-    `;
-  }
-  // 未登录：登录/注册面板
-  return `
-    <div class="captain-hero" style="text-align:center;padding:28px 20px">
-      <div style="font-size:56px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));margin-bottom:6px">🧭</div>
-      <div class="captain-name" style="font-size:20px">登船 · 领取你的船长证</div>
-      <div style="font-size:12px;color:var(--sub);margin-top:6px;letter-spacing:1px">账号系统即将开放，敬请期待</div>
+      <div class="captain-stats">
+        <div class="cstat"><div class="n">${totalCheckins}</div><div class="l">累计打卡</div></div>
+        <div class="cstat"><div class="n">${maxStreak}</div><div class="l">最长连续</div></div>
+        <div class="cstat"><div class="n">${certCount}</div><div class="l">征服证书</div></div>
+      </div>
     </div>
-    <div style="text-align:center;padding:32px 20px;margin:0 14px;background:var(--card);border:1px solid var(--line);border-radius:14px">
-      <div style="font-size:40px;margin-bottom:10px">⛵</div>
-      <div style="font-size:15px;color:var(--gold);margin-bottom:8px">登录 / 注册功能开发中</div>
-      <div style="font-size:12px;color:var(--sub);line-height:1.8">手机验证码、邮箱、账号密码登录<br>将在后端接入后开放<br><span style="color:var(--gold);opacity:.7">当前版本为本地体验版，数据仅存本机</span></div>
-    </div>
-    <div class="auth-tip">当前为本地体验版 · 登录功能即将上线</div>
+    <div class="section-title">征服证书 · Certificates</div>
+    ${certs}
+    <div class="section-title">船员服务 · Services</div>
+    <div class="list-item" onclick="openService()"><span class="li-ic">💬</span><span class="li-text">联系船务长 · 进官方船队</span><span class="li-arrow">›</span></div>
+    <div class="list-item" onclick="toast('打卡提醒','每日 21:00 推送打卡提醒')"><span class="li-ic">🔔</span><span class="li-text">打卡提醒</span><span class="li-arrow">›</span></div>
+    <div class="list-item" onclick="toast('隐私政策','完整隐私政策请访问官网页面')"><span class="li-ic">🔒</span><span class="li-text">隐私政策</span><span class="li-arrow">›</span></div>
+    <div class="list-item" onclick="resetLocal()"><span class="li-ic">🔄</span><span class="li-text">重置本地数据</span><span class="li-arrow">›</span></div>
+    <div style="text-align:center;color:var(--sub);font-size:11px;margin-top:24px;letter-spacing:2px">GRAND BLUE · V1.3</div>
   `;
 }
 
@@ -1315,9 +1422,20 @@ function openService(){openMask('maskService')}
 function confirmDelete(){openMask('maskDelete')}
 function doDelete(){
   localStorage.removeItem('dalanhai_v2');
+  localStorage.removeItem('dalanhai_used_names');
   closeMask('maskDelete');
   currentView={tab:'islands',island:null};render();
-  toast('已弃船','账号与本地记录已清除，7天冷静期后彻底删除');
+  toast('已重置','本地航行记录已清除');
+}
+function resetLocal(){
+  openMask('maskResetLocal');
+}
+function doResetLocal(){
+  localStorage.removeItem('dalanhai_v2');
+  localStorage.removeItem('dalanhai_used_names');
+  closeMask('maskResetLocal');
+  currentView={tab:'islands',island:null};render();
+  toast('已重置','本地数据已清除，重新开始航行');
 }
 function openMask(id){document.getElementById(id).classList.add('show')}
 function closeMask(id){document.getElementById(id).classList.remove('show');if(adTimer){clearInterval(adTimer);adTimer=null}}
