@@ -966,8 +966,9 @@ function renderCmtList(p){
 }
 function toggleComment(){
   const bar=document.getElementById('pdCmtBar');if(!bar)return;
-  bar.style.display=bar.style.display==='none'?'flex':'none';
-  if(bar.style.display==='flex'){const inp=document.getElementById('pdCmtText');if(inp)inp.focus();}
+  const show=bar.style.display!=='flex';
+  bar.style.display=show?'flex':'none';
+  if(show){const inp=document.getElementById('pdCmtText');if(inp)inp.focus();}
 }
 function submitComment(pid){
   const inp=document.getElementById('pdCmtText');if(!inp)return;
