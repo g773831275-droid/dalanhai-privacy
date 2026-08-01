@@ -55,6 +55,13 @@ workflows:
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" ios/App/App/Info.plist
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" ios/App/App/Info.plist
 
+      - name: Add camera and photo permissions
+        script: |
+          # 相机权限 (头像/发帖选"拍照"时必需, 否则 WKWebView 调相机崩溃 - 修 2.1(a))
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 拍摄照片用于设置头像和发布航海日志" ios/App/App/Info.plist 2>/dev/null || true
+          # 相册权限 (选"照片库"时声明)
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 选择照片用于设置头像和发布航海日志" ios/App/App/Info.plist 2>/dev/null || true
+
       - name: Set up code signing
         script: xcode-project use-profiles
 

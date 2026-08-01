@@ -598,6 +598,33 @@
   </div>
 </div>
 
+<!-- EULA 用户协议 (UGC 1.2 要求) -->
+<div class="mask" id="maskEULA">
+  <div class="modal" style="max-width:380px;text-align:left">
+    <h3 style="text-align:center">大蓝海 航海守则</h3>
+    <div style="font-size:13px;color:var(--sub);line-height:1.8;max-height:46vh;overflow-y:auto;margin:12px 0;padding:12px;background:rgba(0,0,0,.25);border-radius:10px">
+      <p>欢迎使用大蓝海。使用港口、发帖、评论等功能即表示你同意以下守则：</p>
+      <p><strong>1. 内容规范</strong>：禁止发布色情、暴力、歧视、骚扰、违法内容及他人隐私信息。</p>
+      <p><strong>2. 用户行为</strong>：尊重其他船员，禁止辱骂、人身攻击、刷屏骚扰。</p>
+      <p><strong>3. 举报与拉黑</strong>：遇到不良内容或用户，请举报或拉黑。我们承诺 24 小时内处理举报，移除违规内容并封禁违规用户。</p>
+      <p><strong>4. 免责</strong>：用户发布的内容由用户自行负责，本 App 不对所有内容进行事前审核。</p>
+      <p><strong>5. 违规处理</strong>：违规用户将被拉黑、内容移除，严重者永久封禁。</p>
+    </div>
+    <button class="btn-primary" onclick="acceptEULA()">同意并继续</button>
+    <button class="btn-ghost" onclick="rejectEULA()">不同意</button>
+  </div>
+</div>
+
+<!-- 评论操作菜单 (举报/删除) -->
+<div class="mask" id="maskCmtAction">
+  <div class="modal" style="max-width:320px">
+    <h3>评论操作</h3>
+    <button class="btn-primary" style="background:linear-gradient(180deg,#e97561,#a3311f);color:#fff" onclick="doCmtReport()">🚩 举报这条评论</button>
+    <button class="btn-primary" style="background:linear-gradient(180deg,#5a6f8c,#2d3d55);color:#c8d5e6" onclick="doCmtDelete()">🗑 删除这条评论</button>
+    <button class="btn-ghost" onclick="closeMask('maskCmtAction')">取消</button>
+  </div>
+</div>
+
 <!-- 发帖 -->
 <div class="mask" id="maskCompose">
   <div class="modal composer">
@@ -835,7 +862,8 @@ function renderPort(){
   });
   html+=`</div>`;
 
-  const posts=d.posts.filter(p=>portFilter==='all'||p.island===portFilter);
+  const blocked=d.blockedUsers||[];
+  const posts=d.posts.filter(p=>(portFilter==='all'||p.island===portFilter)&&!blocked.includes(p.author));
   if(!posts.length){
     html+=`<div class="empty"><span class="big">🌊</span>这片海域还很安静<br>点右下角 ＋ 发出第一条日志</div>`;
     return html;
@@ -868,6 +896,7 @@ function renderPort(){
 function setPortFilter(f){portFilter=f;render()}
 
 function openComposer(){
+  if(!checkEULA())return;
   composerImgs=[null,null,null];composerTags=[];
   document.getElementById('composeText').value='';
   const tags=['清心岛','戒烟岛','健身岛','早睡岛','日更','新船员','妙招'];
@@ -963,13 +992,34 @@ function likePost(id){
 function renderCmtList(p,pid){
   const cmts=p.comments||[];
   if(!cmts.length)return '<div class="pd-cmt-empty">💬 暂无评论</div>';
-  return cmts.map((c,i)=>`<div class="pd-cmt" oncontextmenu="event.preventDefault();deleteCommentPrompt('${pid}',${i})" ontouchstart="pdCmtTouchStart(event,${i},'${pid}') ontouchend="pdCmtTouchEnd(event)" data-i="${i}" data-pid="${pid}"><div class="pd-cmt-ava">${c.avatar||'航'}</div><div><div class="pd-cmt-name">${c.name} · <span style="color:var(--sub);font-size:11px">长按删除</span></div><div class="pd-cmt-text">${c.text}</div></div></div>`).join('');
+  return cmts.map((c,i)=>`<div class="pd-cmt" oncontextmenu="event.preventDefault();cmtActionPrompt('${pid}',${i})" ontouchstart="pdCmtTouchStart(event,${i},'${pid}')" ontouchend="pdCmtTouchEnd(event)" data-i="${i}" data-pid="${pid}"><div class="pd-cmt-ava">${c.avatar||'航'}</div><div><div class="pd-cmt-name">${c.name} · <span style="color:var(--sub);font-size:11px">长按举报/删除</span></div><div class="pd-cmt-text">${c.text}</div></div></div>`).join('');
 }
-let _pdCmtLongPressTimer=null;
+let _pdCmtLongPressTimer=null,_cmtActionCtx=null;
 function pdCmtTouchStart(e,i,pid){
-  _pdCmtLongPressTimer=setTimeout(()=>{deleteCommentPrompt(pid,i);},500);
+  _pdCmtLongPressTimer=setTimeout(()=>{cmtActionPrompt(pid,i);},500);
 }
 function pdCmtTouchEnd(e){if(_pdCmtLongPressTimer){clearTimeout(_pdCmtLongPressTimer);_pdCmtLongPressTimer=null;}}
+function cmtActionPrompt(pid,i){
+  _cmtActionCtx={pid,i};
+  openMask('maskCmtAction');
+}
+function doCmtReport(){
+  if(!_cmtActionCtx)return;
+  reportComment(_cmtActionCtx.pid,_cmtActionCtx.i);
+  closeMask('maskCmtAction');_cmtActionCtx=null;
+}
+function doCmtDelete(){
+  if(!_cmtActionCtx)return;
+  const {pid,i}=_cmtActionCtx;
+  const d=loadData();const p=d.posts.find(x=>x.id===pid);if(!p||!p.comments){closeMask('maskCmtAction');return;}
+  p.comments.splice(i,1);saveData(d);
+  closeMask('maskCmtAction');_cmtActionCtx=null;
+  render();toast('已删除','评论已删除');
+}
+function reportCommentPrompt(pid,i){
+  if(!confirm('举报这条评论？我们将在 24 小时内处理'))return;
+  reportComment(pid,i);
+}
 function deleteCommentPrompt(pid,i){
   if(!confirm('删除这条评论？'))return;
   const d=loadData();const p=d.posts.find(x=>x.id===pid);if(!p||!p.comments)return;
@@ -1025,12 +1075,13 @@ function renderPostDetail(id){
     <div class="pd">
       ${cover}
       <div class="pd-body">
-        <div class="pd-author"><div class="pd-ava">${p.avatarUrl?`<img src="${p.avatarUrl}" alt="">`:p.avatar}</div><div><div class="pd-name">${p.author}</div><div class="pd-ago">${p.ago} · ${p.island?getIsland(p.island).name:''}</div></div>${isMine?`<div class="pd-del" onclick="confirmDeletePost('${p.id}')">🗑 删除</div>`:''}</div>
+        <div class="pd-author"><div class="pd-va">${p.avatarUrl?`<img src="${p.avatarUrl}" alt="">`:p.avatar}</div><div><div class="pd-name">${p.author}</div><div class="pd-ago">${p.ago} · ${p.island?getIsland(p.island).name:''}</div></div>${isMine?`<div class="pd-del" onclick="confirmDeletePost('${p.id}')">🗑 删除</div>`:`<div class="pd-del" style="color:var(--sub);border-color:var(--line)" onclick="blockUser('${p.author}')">🚫 拉黑</div>`}</div>
         <div class="pd-text">${p.text}</div>
         <div class="pd-tags">${(p.tags||[]).map(t=>`<span class="post-tag">#${t}</span>`).join('')}</div>
         <div class="pd-actions">
           <div class="pd-act ${p.liked?'on':''}" onclick="likePost('${p.id}')"><span class="pd-ico">♥</span> ${p.likes}</div>
           <div class="pd-act" onclick="toggleComment()"><span class="pd-ico">💬</span> ${(p.comments&&p.comments.length)||'评论'}</div>
+          <div class="pd-act" onclick="reportPost('${p.id}')" style="margin-left:auto"><span class="pd-ico">🚩</span> 举报</div>
         </div>
         <div class="pd-cmts">
           <div id="pdCmtList">${renderCmtList(p,p.id)}</div>
@@ -1451,6 +1502,50 @@ function doResetLocal(){
   closeMask('maskResetLocal');
   currentView={tab:'islands',island:null};render();
   toast('已重置','本地数据已清除，重新开始航行');
+}
+/* EULA 用户协议 (UGC 1.2) */
+function checkEULA(){
+  if(!localStorage.getItem('dalanhai_eula')){
+    openMask('maskEULA');
+    return false;
+  }
+  return true;
+}
+function acceptEULA(){
+  localStorage.setItem('dalanhai_eula','1');
+  closeMask('maskEULA');
+  toast('欢迎登船','已同意航海守则，开启你的航行');
+}
+function rejectEULA(){
+  closeMask('maskEULA');
+  currentView={tab:'islands',island:null};render();
+  toast('未同意守则','需同意航海守则才能使用港口功能');
+}
+/* 举报 (UGC 1.2) */
+function reportPost(pid){
+  const d=loadData();
+  if(!d.reports)d.reports=[];
+  d.reports.push({type:'post',id:pid,time:Date.now()});
+  saveData(d);
+  toast('已举报','我们将在 24 小时内处理，感谢你的反馈');
+}
+function reportComment(pid,ci){
+  const d=loadData();
+  if(!d.reports)d.reports=[];
+  d.reports.push({type:'comment',postId:pid,idx:ci,time:Date.now()});
+  saveData(d);
+  toast('已举报','我们将在 24 小时内处理');
+}
+/* 拉黑 (UGC 1.2) */
+function blockUser(name){
+  if(!name||name==='航海家'){toast('提示','不能拉黑自己');return;}
+  const d=loadData();
+  if(!d.blockedUsers)d.blockedUsers=[];
+  if(d.blockedUsers.includes(name)){toast('已拉黑','该用户已在黑名单');return;}
+  d.blockedUsers.push(name);
+  saveData(d);
+  toast('已拉黑',name+' 的内容将不再显示');
+  currentView={tab:'port',island:null,postId:null};render();
 }
 function openMask(id){document.getElementById(id).classList.add('show')}
 function closeMask(id){document.getElementById(id).classList.remove('show');if(adTimer){clearInterval(adTimer);adTimer=null}}
