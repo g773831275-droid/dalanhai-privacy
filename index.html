@@ -614,16 +614,6 @@
   </div>
 </div>
 
-<!-- 评论操作菜单 (举报/删除) -->
-<div class="mask" id="maskCmtAction">
-  <div class="modal" style="max-width:320px">
-    <h3>评论操作</h3>
-    <button class="btn-primary" style="background:linear-gradient(180deg,#e97561,#a3311f);color:#fff" onclick="doCmtReport()">🚩 举报这条评论</button>
-    <button class="btn-primary" style="background:linear-gradient(180deg,#5a6f8c,#2d3d55);color:#c8d5e6" onclick="doCmtDelete()">🗑 删除这条评论</button>
-    <button class="btn-ghost" onclick="closeMask('maskCmtAction')">取消</button>
-  </div>
-</div>
-
 <!-- 发帖 -->
 <div class="mask" id="maskCompose">
   <div class="modal composer">
@@ -988,59 +978,6 @@ function likePost(id){
   if(p.liked){p.liked=false;p.likes--;}else{p.liked=true;p.likes++;}
   saveData(d);render();
 }
-function renderCmtList(p,pid){
-  const cmts=p.comments||[];
-  if(!cmts.length)return '<div class="pd-cmt-empty">💬 暂无评论</div>';
-  return cmts.map((c,i)=>`<div class="pd-cmt" oncontextmenu="event.preventDefault();cmtActionPrompt('${pid}',${i})" ontouchstart="pdCmtTouchStart(event,${i},'${pid}')" ontouchend="pdCmtTouchEnd(event)" data-i="${i}" data-pid="${pid}"><div class="pd-cmt-ava">${c.avatar||'航'}</div><div><div class="pd-cmt-name">${c.name} · <span style="color:var(--sub);font-size:11px">长按举报/删除</span></div><div class="pd-cmt-text">${c.text}</div></div></div>`).join('');
-}
-let _pdCmtLongPressTimer=null,_cmtActionCtx=null;
-function pdCmtTouchStart(e,i,pid){
-  _pdCmtLongPressTimer=setTimeout(()=>{cmtActionPrompt(pid,i);},500);
-}
-function pdCmtTouchEnd(e){if(_pdCmtLongPressTimer){clearTimeout(_pdCmtLongPressTimer);_pdCmtLongPressTimer=null;}}
-function cmtActionPrompt(pid,i){
-  _cmtActionCtx={pid,i};
-  openMask('maskCmtAction');
-}
-function doCmtReport(){
-  if(!_cmtActionCtx)return;
-  reportComment(_cmtActionCtx.pid,_cmtActionCtx.i);
-  closeMask('maskCmtAction');_cmtActionCtx=null;
-}
-function doCmtDelete(){
-  if(!_cmtActionCtx)return;
-  const {pid,i}=_cmtActionCtx;
-  const d=loadData();const p=d.posts.find(x=>x.id===pid);if(!p||!p.comments){closeMask('maskCmtAction');return;}
-  p.comments.splice(i,1);saveData(d);
-  closeMask('maskCmtAction');_cmtActionCtx=null;
-  render();toast('已删除','评论已删除');
-}
-function reportCommentPrompt(pid,i){
-  if(!confirm('举报这条评论？我们将在 24 小时内处理'))return;
-  reportComment(pid,i);
-}
-function deleteCommentPrompt(pid,i){
-  if(!confirm('删除这条评论？'))return;
-  const d=loadData();const p=d.posts.find(x=>x.id===pid);if(!p||!p.comments)return;
-  p.comments.splice(i,1);
-  saveData(d);render();
-  toast('已删除','评论已删除');
-}
-function toggleComment(){
-  const bar=document.getElementById('pdCmtBar');if(!bar)return;
-  const show=bar.style.display!=='flex';
-  bar.style.display=show?'flex':'none';
-  if(show){const inp=document.getElementById('pdCmtText');if(inp)inp.focus();}
-}
-function submitComment(pid){
-  const inp=document.getElementById('pdCmtText');if(!inp)return;
-  const text=inp.value.trim();if(!text)return;
-  const d=loadData();const p=d.posts.find(x=>x.id===pid);if(!p)return;
-  if(!p.comments)p.comments=[];
-  p.comments.push({name:'航海家',avatar:'航',text:text,time:Date.now()});
-  saveData(d);render();
-  setTimeout(()=>{const bar=document.getElementById('pdCmtBar');if(bar){bar.style.display='flex';const list=document.getElementById('pdCmtList');if(list)list.scrollTop=list.scrollHeight;}},50);
-}
 let _delPostId=null;
 function confirmDeletePost(id){_delPostId=id;openMask('maskDelPost')}
 function deletePost(){
@@ -1078,15 +1015,7 @@ function renderPostDetail(id){
         <div class="pd-tags">${(p.tags||[]).map(t=>`<span class="post-tag">#${t}</span>`).join('')}</div>
         <div class="pd-actions">
           <div class="pd-act ${p.liked?'on':''}" onclick="likePost('${p.id}')"><span class="pd-ico">♥</span> ${p.likes}</div>
-          <div class="pd-act" onclick="toggleComment()"><span class="pd-ico">💬</span> ${(p.comments&&p.comments.length)||'评论'}</div>
           <div class="pd-act" onclick="reportPost('${p.id}')" style="margin-left:auto"><span class="pd-ico">🚩</span> 举报</div>
-        </div>
-        <div class="pd-cmts">
-          <div id="pdCmtList">${renderCmtList(p,p.id)}</div>
-          <div class="pd-cmt-input-bar" id="pdCmtBar">
-            <input class="pd-cmt-input" id="pdCmtText" placeholder="说点什么..." onkeydown="if(event.key==='Enter')submitComment('${p.id}')">
-            <button class="pd-cmt-send" onclick="submitComment('${p.id}')">发送</button>
-          </div>
         </div>
       </div>
     </div>
