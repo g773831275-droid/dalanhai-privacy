@@ -51,8 +51,8 @@
       radial-gradient(circle at 40% 80%, rgba(125,196,255,.10) 0 2px, transparent 3px);
     background-size:220px 220px, 300px 300px, 260px 260px;
   }
-  #app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative;z-index:1;
-       box-shadow:0 0 60px rgba(0,0,0,.6);}
+  #app{max-width:480px;margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;position:relative;z-index:1;
+       box-shadow:0 0 60px rgba(0,0,0,.6);overflow:hidden}
   .statusbar{height:env(safe-area-inset-top,20px);background:#04101F}
 
   /* ============ 顶栏 ============ */
@@ -337,7 +337,8 @@
   .pd-cmts{margin-top:14px}
   .pd-cmt-empty{text-align:center;color:var(--sub);font-size:13px;padding:24px 12px;line-height:1.8}
   .pd-cmt-empty span{font-size:11px;opacity:.7}
-  .pd-cmt{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .pd-cmt{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);-webkit-user-select:none;user-select:none}
+  .pd-cmt:active{background:rgba(232,184,74,.06)}
   .pd-cmt-ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#F7D77A,#B7702B);color:#2A1A05;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
   .pd-cmt-name{font-size:12px;color:var(--gold);margin-bottom:2px}
   .pd-cmt-text{font-size:14px;color:#EAF2FF;line-height:1.5}
@@ -959,16 +960,29 @@ function likePost(id){
   if(p.liked){p.liked=false;p.likes--;}else{p.liked=true;p.likes++;}
   saveData(d);render();
 }
-function renderCmtList(p){
+function renderCmtList(p,pid){
   const cmts=p.comments||[];
   if(!cmts.length)return '<div class="pd-cmt-empty">💬 暂无评论</div>';
-  return cmts.map(c=>`<div class="pd-cmt"><div class="pd-cmt-ava">${c.avatar||'航'}</div><div><div class="pd-cmt-name">${c.name}</div><div class="pd-cmt-text">${c.text}</div></div></div>`).join('');
+  return cmts.map((c,i)=>`<div class="pd-cmt" oncontextmenu="event.preventDefault();deleteCommentPrompt('${pid}',${i})" ontouchstart="pdCmtTouchStart(event,${i},'${pid}') ontouchend="pdCmtTouchEnd(event)" data-i="${i}" data-pid="${pid}"><div class="pd-cmt-ava">${c.avatar||'航'}</div><div><div class="pd-cmt-name">${c.name} · <span style="color:var(--sub);font-size:11px">长按删除</span></div><div class="pd-cmt-text">${c.text}</div></div></div>`).join('');
+}
+let _pdCmtLongPressTimer=null;
+function pdCmtTouchStart(e,i,pid){
+  _pdCmtLongPressTimer=setTimeout(()=>{deleteCommentPrompt(pid,i);},500);
+}
+function pdCmtTouchEnd(e){if(_pdCmtLongPressTimer){clearTimeout(_pdCmtLongPressTimer);_pdCmtLongPressTimer=null;}}
+function deleteCommentPrompt(pid,i){
+  if(!confirm('删除这条评论？'))return;
+  const d=loadData();const p=d.posts.find(x=>x.id===pid);if(!p||!p.comments)return;
+  p.comments.splice(i,1);
+  saveData(d);render();
+  toast('已删除','评论已删除');
 }
 function toggleComment(){
   const bar=document.getElementById('pdCmtBar');if(!bar)return;
   const show=bar.style.display!=='flex';
   bar.style.display=show?'flex':'none';
-  if(show){const inp=document.getElementById('pdCmtText');if(inp)inp.focus();}
+  if(show){const inp=document.getElementById('pdCmtText');if(inp){inp.focus();setTimeout(()=>window.scrollTo(0,document.body.scrollHeight),50);}}
+  else{window.scrollTo(0,0)}
 }
 function submitComment(pid){
   const inp=document.getElementById('pdCmtText');if(!inp)return;
@@ -1019,7 +1033,7 @@ function renderPostDetail(id){
           <div class="pd-act" onclick="toggleComment()"><span class="pd-ico">💬</span> ${(p.comments&&p.comments.length)||'评论'}</div>
         </div>
         <div class="pd-cmts">
-          <div id="pdCmtList">${renderCmtList(p)}</div>
+          <div id="pdCmtList">${renderCmtList(p,p.id)}</div>
           <div class="pd-cmt-input-bar" id="pdCmtBar">
             <input class="pd-cmt-input" id="pdCmtText" placeholder="说点什么..." onkeydown="if(event.key==='Enter')submitComment('${p.id}')">
             <button class="pd-cmt-send" onclick="submitComment('${p.id}')">发送</button>
