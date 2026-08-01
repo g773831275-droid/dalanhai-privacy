@@ -51,8 +51,8 @@
       radial-gradient(circle at 40% 80%, rgba(125,196,255,.10) 0 2px, transparent 3px);
     background-size:220px 220px, 300px 300px, 260px 260px;
   }
-  #app{max-width:480px;margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;position:relative;z-index:1;
-       box-shadow:0 0 60px rgba(0,0,0,.6);overflow:hidden}
+  #app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative;z-index:1;
+       box-shadow:0 0 60px rgba(0,0,0,.6);}
   .statusbar{height:env(safe-area-inset-top,20px);background:#04101F}
 
   /* ============ 顶栏 ============ */
@@ -337,8 +337,7 @@
   .pd-cmts{margin-top:14px}
   .pd-cmt-empty{text-align:center;color:var(--sub);font-size:13px;padding:24px 12px;line-height:1.8}
   .pd-cmt-empty span{font-size:11px;opacity:.7}
-  .pd-cmt{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);-webkit-user-select:none;user-select:none}
-  .pd-cmt:active{background:rgba(232,184,74,.06)}
+  .pd-cmt{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
   .pd-cmt-ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#F7D77A,#B7702B);color:#2A1A05;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
   .pd-cmt-name{font-size:12px;color:var(--gold);margin-bottom:2px}
   .pd-cmt-text{font-size:14px;color:#EAF2FF;line-height:1.5}
@@ -1031,8 +1030,7 @@ function toggleComment(){
   const bar=document.getElementById('pdCmtBar');if(!bar)return;
   const show=bar.style.display!=='flex';
   bar.style.display=show?'flex':'none';
-  if(show){const inp=document.getElementById('pdCmtText');if(inp){inp.focus();setTimeout(()=>window.scrollTo(0,document.body.scrollHeight),50);}}
-  else{window.scrollTo(0,0)}
+  if(show){const inp=document.getElementById('pdCmtText');if(inp)inp.focus();}
 }
 function submitComment(pid){
   const inp=document.getElementById('pdCmtText');if(!inp)return;
@@ -1499,6 +1497,7 @@ function resetLocal(){
 function doResetLocal(){
   localStorage.removeItem('dalanhai_v2');
   localStorage.removeItem('dalanhai_used_names');
+  localStorage.removeItem('dalanhai_eula');
   closeMask('maskResetLocal');
   currentView={tab:'islands',island:null};render();
   toast('已重置','本地数据已清除，重新开始航行');
@@ -1519,7 +1518,7 @@ function acceptEULA(){
 function rejectEULA(){
   closeMask('maskEULA');
   currentView={tab:'islands',island:null};render();
-  toast('未同意守则','需同意航海守则才能使用港口功能');
+  toast('未同意守则','下次点 + 会再次弹出航海守则');
 }
 /* 举报 (UGC 1.2) */
 function reportPost(pid){
