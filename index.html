@@ -429,8 +429,10 @@
 
   /* ============ 弹窗 ============ */
   .mask{position:fixed;inset:0;background:rgba(4,10,20,.75);backdrop-filter:blur(4px);display:none;
-        align-items:center;justify-content:center;z-index:100;padding:24px}
+        align-items:center;justify-content:center;z-index:100;padding:24px;overflow-y:auto}
   .mask.show{display:flex}
+  /* 键盘弹出时弹窗贴顶部, 不被推上去 */
+  body.keyboard-open .mask{align-items:flex-start;padding-top:60px}
   .modal{
     background:linear-gradient(180deg,#0e2547,#04101F);
     border:1px solid rgba(232,184,74,.35);
@@ -1513,6 +1515,16 @@ function drawQR(){
   svg.innerHTML=cells;
 }
 render();
+/* 键盘弹出检测: 视口高度 < 70% 原高度时加 keyboard-open class */
+let _origH=window.innerHeight;
+window.addEventListener('resize',()=>{
+  if(window.innerHeight < _origH*0.7){
+    document.body.classList.add('keyboard-open');
+  }else{
+    document.body.classList.remove('keyboard-open');
+    _origH=window.innerHeight;
+  }
+});
 </script>
 </body>
 </html>
