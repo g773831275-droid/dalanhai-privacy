@@ -1007,7 +1007,7 @@ function deletePost(){
 function renderPostDetail(id){
   const d=loadData();const p=d.posts.find(x=>x.id===id);
   if(!p)return '<div class="empty"><span class="big">🌊</span>帖子不存在或已被删除</div>';
-  const isMine=d.captain&&p.author===d.captain.name;
+  const isMine = p.id.startsWith('u');
   const imgs=(p.images&&p.images.length)?p.images:(p.image?[p.image]:[]);
   let cover='';
   if(imgs.length){
@@ -1028,7 +1028,7 @@ function renderPostDetail(id){
         <div class="pd-tags">${(p.tags||[]).map(t=>`<span class="post-tag">#${t}</span>`).join('')}</div>
         <div class="pd-actions">
           <div class="pd-act ${p.liked?'on':''}" onclick="likePost('${p.id}')"><span class="pd-ico">♥</span> ${p.likes}</div>
-          <div class="pd-act" onclick="reportPost('${p.id}')" style="margin-left:auto"><span class="pd-ico">🚩</span> 举报</div>
+          ${isMine?'':`<div class="pd-act" onclick="reportPost('${p.id}')" style="margin-left:auto"><span class="pd-ico">🚩</span> 举报</div>`}
         </div>
       </div>
     </div>
