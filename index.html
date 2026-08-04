@@ -1034,7 +1034,7 @@ function renderPostDetail(id){
     <div class="pd">
       ${cover}
       <div class="pd-body">
-        <div class="pd-author"><div class="pd-va">${p.avatarUrl?`<img src="${p.avatarUrl}" alt="">`:p.avatar}</div><div><div class="pd-name">${p.author}</div><div class="pd-ago">${p.ago} · ${p.island?getIsland(p.island).name:''}</div></div>${isMine?`<div class="pd-del" onclick="confirmDeletePost('${p.id}')">🗑 删除</div>`:`<div class="pd-del" style="color:var(--sub);border-color:var(--line)" onclick="blockUser('${p.author}')">🚫 拉黑</div>`}</div>
+        <div class="pd-author"><div class="pd-ava">${p.avatarUrl?`<img src="${p.avatarUrl}" alt="">`:p.avatar}</div><div><div class="pd-name">${p.author}</div><div class="pd-ago">${p.ago} · ${p.island?getIsland(p.island).name:''}</div></div>${isMine?`<div class="pd-del" onclick="confirmDeletePost('${p.id}')">🗑 删除</div>`:`<div class="pd-del" style="color:var(--sub);border-color:var(--line)" onclick="blockUser('${p.author}')">🚫 拉黑</div>`}</div>
         <div class="pd-text">${p.text}</div>
         <div class="pd-tags">${(p.tags||[]).map(t=>`<span class="post-tag">#${t}</span>`).join('')}</div>
         <div class="pd-actions">
