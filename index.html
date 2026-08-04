@@ -79,7 +79,7 @@
   }
 
   /* ============ 内容 ============ */
-  .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 100px;position:relative;z-index:2}
+  .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px calc(72px + env(safe-area-inset-bottom,0px) + 24px);position:relative;z-index:2}
   .content::-webkit-scrollbar{display:none}
 
   /* ============ Hero 航海图 ============ */
