@@ -948,10 +948,21 @@ function refreshComposerImgs(){
       :`<div class="img-slot" onclick="pickImg(${i})">＋</div>`
   ).join('');
 }
+/* 敏感词过滤 (1.2 UGC 要求: 内容过滤机制) */
+const BANNED_WORDS=['色情','黄片','约炮','援交','卖淫','嫖娼','成人视频','裸体','裸照','一夜情','av女优','色情网站','杀人','放火','抢劫','强奸','暴力恐怖','恐怖袭击','炸弹制作','枪支制造','自杀方法','赌博','时时彩','百家乐','赌球','赌场','博彩平台','毒品','大麻','冰毒','摇头丸','海洛因','可卡因','吸毒','贩毒','反动','推翻政府','分裂国家','港独','台独','疆独','藏独','辱华','支那','东亚病夫','纳粹','希特勒','种族灭绝','傻逼','草泥马','尼玛','fuck','shit','混蛋','滚蛋','绿茶婊','圣母婊','小三','婊子','贱货','骚货','加我微信','vx:','qq:','赚钱兼职','刷单','代购','招嫖','找小姐','同城约','一夜情约炮'];
+function filterText(text){
+  const lower=text.toLowerCase();
+  for(const w of BANNED_WORDS){
+    if(lower.includes(w.toLowerCase()))return w;
+  }
+  return null;
+}
 function submitPost(){
   const text=document.getElementById('composeText').value.trim();
   const images=composerImgs.filter(x=>x);
   if(!text && !images.length){toast('未填写内容','写点什么，或至少传一张图');return;}
+  const badWord=text?filterText(text):null;
+  if(badWord){toast('内容违规','含敏感词: '+badWord+'，请修改后发布');return;}
   const d=loadData();
   const emojiPool=['⚓','🌊','🧭','🏴‍☠️','⛵','💪','🌙','🧘','🚭'];
   const bgPool=['linear-gradient(135deg,#123A6B,#4da6ff)','linear-gradient(135deg,#0F6E56,#2ecc9e)','linear-gradient(135deg,#3b2205,#e8b84a)','linear-gradient(135deg,#1a1550,#7a6be0)'];
